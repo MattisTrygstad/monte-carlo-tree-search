@@ -12,7 +12,7 @@ class HexagonalGridState(UniversalState):
     def __init__(self) -> None:
         super().__init__()
 
-        self.neighbors = [(-1, -1), (-1, 0), (0, -1), (0, 1), (1, 0), (1, 1)]
+        self.neighbors = [(-1, 0), (-1, 1), (0, -1), (0, 1), (1, -1), (1, 0)]
         self.size = Config.board_size
 
         self.edges = []  # [((x,y),(i,j)),...)]
@@ -34,17 +34,10 @@ class HexagonalGridState(UniversalState):
                     self.nodes[(row, col)] = NodeState.EMPTY.value
                     self.node_names[(row, col)] = f'{row},{col}'
         elif Config.board_type == BoardType.DIAMOND.value:
-            for row in range(self.size):
-                for col in range(self.size):
-                    # Constuct two right triangles, which together will form a parallelogram. Will be offset to a diamond pattern when visualizing.
-                    if row >= col:
-                        # Top triangle
-                        self.nodes[(row, col)] = NodeState.EMPTY.value
-                        self.node_names[(row, col)] = f'{row},{col}'
-                    else:
-                        # Bottom triangle
-                        self.nodes[(row + self.size, col)] = NodeState.EMPTY.value
-                        self.node_names[(row + self.size, col)] = f'{row + self.size}, {col}'
+            for x in range(self.size):
+                for y in range(self.size):
+                    self.nodes[(x, y)] = NodeState.EMPTY.value
+                    self.node_names[(x, y)] = f'{x},{y}'
 
         # Set filled nodes
         for (row, col) in Config.filled_nodes:
@@ -58,11 +51,10 @@ class HexagonalGridState(UniversalState):
 
     def __generate_coordinates(self) -> None:
         for (row, col) in self.nodes:
-            # Rotate entire grid 90deg to match action offsets
-            (x, y) = rotation_matrix(row, col, -pi / 2)
-
-            # Offset in x direction (parallelogram -> diamond and right triangle -> equilateral triangle)
-            self.node_coordinates[(row, col)] = (x + 1 / 2 * y, y)
+            # Rotate entire grid 45deg to match action offsets
+            (x, y) = rotation_matrix(row, col, - 3 * pi / 4)
+            #(x, y) = (row, col)
+            self.node_coordinates[(row, col)] = (x, y)
 
     def get_empty_nodes(self) -> dict:
         return {key: value for (key, value) in self.nodes.items() if value == NodeState.EMPTY.value}

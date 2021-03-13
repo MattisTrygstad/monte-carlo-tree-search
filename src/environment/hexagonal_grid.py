@@ -94,11 +94,11 @@ class HexagonalGrid(Environment):
         self.ax.tick_params(left=True, bottom=True, labelleft=True, labelbottom=True)
         plt.title('Peg Solitaire') """
 
-        self.ax.text(1, -1, 'Player 2', fontsize=15, color=Color.PLAYER_2.value)
+        """ self.ax.text(1, -1, 'Player 2', fontsize=15, color=Color.PLAYER_2.value)
         self.ax.text(-1.2, -5.2, 'Player 2', fontsize=15, color=Color.PLAYER_2.value)
 
         self.ax.text(-1.2, -1, 'Player 1', fontsize=15, color=Color.PLAYER_1.value)
-        self.ax.text(1, -5.2, 'Player 1', fontsize=15, color=Color.PLAYER_1.value)
+        self.ax.text(1, -5.2, 'Player 1', fontsize=15, color=Color.PLAYER_1.value) """
 
         self.fig.tight_layout()
         plt.show(block=block)
