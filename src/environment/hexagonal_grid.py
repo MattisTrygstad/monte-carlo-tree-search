@@ -76,7 +76,6 @@ class HexagonalGrid(Environment):
         plt.cla()
         empty_nodes = self.state.get_empty_nodes()
         player_one_nodes = self.state.get_player_one_nodes()
-        print(player_one_nodes)
         player_two_nodes = self.state.get_player_two_nodes()
         node_names = self.state.node_names
         node_coordinates = self.state.node_coordinates
