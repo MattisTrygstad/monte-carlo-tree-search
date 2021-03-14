@@ -16,7 +16,7 @@ def normal_game():
         # Check win condition
         if env.check_win_condition():
             print('Congratulations, you won!')
-            env.visualize(True)
+            env.visualize(False, 10)
             break
 
         legal_actions = env.get_legal_actions()
@@ -28,7 +28,7 @@ def normal_game():
 
         player = env.get_player_turn()
 
-        user_input = input(f'{player}s turn: ')
+        user_input = input(f'Player {player.value+1}s turn: ')
         if user_input == 'q':
             break
 

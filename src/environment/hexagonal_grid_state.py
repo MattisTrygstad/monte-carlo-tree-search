@@ -17,7 +17,7 @@ class HexagonalGridState(UniversalState):
 
         self.edges = []  # [((x,y),(i,j)),...)]
         self.node_names = {}  # (row, col): str
-        self.node_coordinates = {}  # (row,col): (x_value, y_value)
+        self.node_coordinates = {}  # (row, col): (x_value, y_value)
 
         # Describes the last executed action
         self.start_pos = ()
