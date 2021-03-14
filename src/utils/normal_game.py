@@ -16,6 +16,7 @@ def normal_game():
         # Check win condition
         if env.check_win_condition():
             print('Congratulations, you won!')
+            env.visualize(True)
             break
 
         legal_actions = env.get_legal_actions()

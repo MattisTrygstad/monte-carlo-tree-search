@@ -61,56 +61,38 @@ class HexagonalGrid(Environment):
         start_col = 0
         goal_col = self.state.size - 1
 
-        nodes = self.state.get_player_one_nodes()
-        path = {}
-        for start_node in nodes.keys():
+        nodes = self.state.get_player_one_nodes().keys()
+
+        for start_node in nodes:
             if start_node[1] != start_col:
                 continue
 
-            distance = {}
-            q = {}
-            path = {}
-            for n in nodes.keys():
-                distance[n] = math.inf
-                q[n] = math.inf
-                path[n] = None
+            queue = [[start_node]]
+            visited = []
 
-            distance[start_node] = 0
+            while queue:
+                path = queue.pop(0)
+                curr_node = path[-1]
 
-            while q:
-                curr_node = min(q, key=q.get)
-
-                del q[curr_node]
+                if curr_node in visited:
+                    continue
 
                 for neighbor in self.state.neighbors:
                     next_node = (curr_node[0] + neighbor[0], curr_node[1] + neighbor[1])
                     if next_node not in nodes:
                         continue
 
-                    new_distance = distance[curr_node] + 1
-                    if new_distance < distance[next_node]:
-                        distance[next_node] = new_distance
-                        path[next_node] = curr_node
+                    new_path = list(path)
+                    new_path.append(next_node)
+                    queue.append(new_path)
 
-        print(path)
+                    if next_node[1] == goal_col:
+                        print('Shortest path:', *new_path)
+                        return True
 
-        shortest_path = []
-        for (child, parent) in path.items():
-            if child[1] != goal_col:
-                continue
+                visited.append(curr_node)
 
-            shortest_path.append(child)
-
-            while True:
-                print('test')
-                if not parent:
-                    break
-                child = path[parent]
-                shortest_path.append(child)
-                parent = child
-
-        shortest_path.reverse()
-        print(shortest_path)
+        return False
 
     def get_state(self) -> UniversalState:
         universal_state = UniversalState()
