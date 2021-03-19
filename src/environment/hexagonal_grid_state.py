@@ -28,16 +28,10 @@ class HexagonalGridState(UniversalState):
         self.__generate_coordinates()
 
     def __generate_nodes(self) -> None:
-        if Config.board_type == BoardType.TRIANGLE.value:
-            for row in range(self.size):
-                for col in range(row + 1):
-                    self.nodes[(row, col)] = NodeState.EMPTY.value
-                    self.node_names[(row, col)] = f'{row},{col}'
-        elif Config.board_type == BoardType.DIAMOND.value:
-            for x in range(self.size):
-                for y in range(self.size):
-                    self.nodes[(x, y)] = NodeState.EMPTY.value
-                    self.node_names[(x, y)] = f'{x},{y}'
+        for x in range(self.size):
+            for y in range(self.size):
+                self.nodes[(x, y)] = NodeState.EMPTY.value
+                self.node_names[(x, y)] = f'{x},{y}'
 
         # Set filled nodes
         for (row, col) in Config.filled_nodes:
@@ -53,7 +47,7 @@ class HexagonalGridState(UniversalState):
         for (row, col) in self.nodes:
             # Rotate entire grid 45deg to match action offsets
             (x, y) = rotation_matrix(row, col, - 3 * pi / 4)
-            #(x, y) = (row, col)
+            # (x, y) = (row, col)
             self.node_coordinates[(row, col)] = (x, y)
 
     def get_empty_nodes(self) -> dict:

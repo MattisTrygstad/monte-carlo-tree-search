@@ -19,11 +19,7 @@ class HexagonalGrid(Environment):
 
     def __init__(self, win_multiplier: int):
         self.history = []
-
-        if Config.board_type == BoardType.DIAMOND.value:
-            self.fig, self.ax = plt.subplots(figsize=(7, 8))
-        else:
-            self.fig, self.ax = plt.subplots(figsize=(9, 7))
+        self.fig, self.ax = plt.subplots(figsize=(7, 8))
 
         self.reset()
 
@@ -96,7 +92,7 @@ class HexagonalGrid(Environment):
 
                     if next_node[node_index] == goal_index:
                         print('Shortest path:', *new_path)
-                        print(f'Player {player.value+1} won!!')
+                        print(f'Player {player.value+1} won')
                         self.shortest_path = new_path
                         self.winner = player
                         return True

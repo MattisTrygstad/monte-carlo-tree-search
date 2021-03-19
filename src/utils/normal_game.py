@@ -15,7 +15,6 @@ def normal_game():
     while True:
         # Check win condition
         if env.check_win_condition():
-            print('Congratulations, you won!')
             env.visualize(False, 10)
             break
 

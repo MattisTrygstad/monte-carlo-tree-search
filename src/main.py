@@ -1,11 +1,13 @@
 
 from datetime import timedelta
 from statistics import mean, median
+import sys
 import time
 
 from matplotlib import pyplot as plt
 from agent.actor import Actor
 from agent.critic import Critic
+from agent.mcts import Node
 from agent.table_approximator import TableApproximator
 from environment.hexagonal_grid import HexagonalGrid
 from environment.universal_action import UniversalAction
@@ -13,11 +15,17 @@ from environment.universal_state import UniversalState
 from utils.config_parser import Config
 from utils.normal_game import normal_game
 
-if Config.nn_critic:
-    from agent.neural_network_approximator import NeuralNetworkApproximator
+
+#from agent.neural_network_approximator import NeuralNetworkApproximator
 
 
 def main():
+    env = HexagonalGrid(0)
+    actions = env.get_legal_actions()
+    player = env.get_player_turn()
+    node = Node(actions, player)
+
+    sys.exit()
     if Config.human_mode:
         normal_game()
 
