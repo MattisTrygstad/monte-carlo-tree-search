@@ -17,11 +17,11 @@ from utils.config_parser import Config
 
 class HexagonalGrid(Environment):
 
-    def __init__(self, win_multiplier: int):
+    def __init__(self, state: UniversalState = None):
         self.history = []
         self.fig, self.ax = plt.subplots(figsize=(7, 8))
 
-        self.reset()
+        self.reset(state)
 
         self.game_counter = 0
 
@@ -91,8 +91,8 @@ class HexagonalGrid(Environment):
                     queue.append(new_path)
 
                     if next_node[node_index] == goal_index:
-                        print('Shortest path:', *new_path)
-                        print(f'Player {player.value+1} won')
+                        # print('Shortest path:', *new_path)
+                        # print(f'Player {player.value+1} won')
                         self.shortest_path = new_path
                         self.winner = player
                         return True
@@ -107,8 +107,8 @@ class HexagonalGrid(Environment):
 
         return universal_state
 
-    def reset(self) -> None:
-        self.state = HexagonalGridState()
+    def reset(self, state: UniversalState = None) -> None:
+        self.state = HexagonalGridState(state)
 
         self.G = nx.Graph()
         self.G.add_nodes_from(self.state.nodes)

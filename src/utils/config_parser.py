@@ -25,10 +25,7 @@ class Config:
     nn_activation_functions = list(ast.literal_eval(config.get('LEARNING', 'nn_activation_functions')))
     actor_learning_rate = float(config.get('LEARNING', 'actor_learning_rate'))
     critic_learning_rate = float(config.get('LEARNING', 'critic_learning_rate'))
-    actor_decay_rate = float(config.get('LEARNING', 'actor_decay_rate'))
-    critic_decay_rate = float(config.get('LEARNING', 'critic_decay_rate'))
-    actor_discount_factor = float(config.get('LEARNING', 'actor_discount_factor'))
-    critic_discount_factor = float(config.get('LEARNING', 'critic_discount_factor'))
+    save_interval = float(config.get('LEARNING', 'critic_learning_rate'))
 
     linear_epsilon = bool(ast.literal_eval(config.get('EPSILON', 'linear_epsilon')))
     exploitation_threshold = int(config.get('EPSILON', 'exploitation_threshold'))

@@ -9,7 +9,7 @@ from utils.trigonometry import rotation_matrix
 
 class HexagonalGridState(UniversalState):
 
-    def __init__(self) -> None:
+    def __init__(self, state: UniversalState = None) -> None:
         super().__init__()
 
         self.neighbors = [(-1, 0), (-1, 1), (0, -1), (0, 1), (1, -1), (1, 0)]
@@ -23,7 +23,12 @@ class HexagonalGridState(UniversalState):
         self.start_pos = ()
         self.end_pos = ()
 
-        self.__generate_nodes()
+        if not state:
+            self.__generate_nodes()
+        else:
+            self.nodes = state.nodes
+            self.node_names = {key: f'{key[0]}, {key[1]}' for key in self.nodes.keys()}
+
         self.__generate_edges()
         self.__generate_coordinates()
 

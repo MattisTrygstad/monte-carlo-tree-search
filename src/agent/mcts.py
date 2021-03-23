@@ -1,55 +1,104 @@
 
 
+from copy import deepcopy
+from random import choice, choices
+from typing import Tuple
 import numpy as np
+from agent.node import Node
 from enums import Player
+from environment.hexagonal_grid import HexagonalGrid
 from environment.universal_action import UniversalAction
+from environment.universal_state import UniversalState
 
 
-class Mcts:
+class MonteCarloTree:
 
-    def __init__(self) -> None:
-        pass
+    def __init__(self, player: Player, state: UniversalState) -> None:
+        self.root = Node(None, None, player)
+        self.init_state = state
+        self.env = HexagonalGrid(self.init_state)
+
+    @staticmethod
+    def get_children_visit_count(node: Node) -> dict:
+        # Key: node_coordinate, value: visit_count
+        return {key: child.visit_count for key, child in node.children.items()}
 
     def single_pass(self) -> None:
-        pass
 
-    def tree_search(self) -> None:
-        pass
+        node = self.tree_search()
+        player = self.env.get_player_turn()
 
-    def expand_node(self) -> None:
-        pass
+        winner = self.evaluate_leaf()
 
-    def evaluate_leaf(self) -> None:
+        self.backprop(node, player, winner)
+
+    def tree_search(self) -> Tuple[Node, HexagonalGrid]:
+        """
+        Traversing the tree from the root to a leaf node by using the tree policy.
+        """
+        node = self.root
+        self.env.reset(self.init_state)
+
+        while len(node.children) != 0:
+            visit_counts = self.get_children_visit_count(node)
+
+            max_value = max(visit_counts.values())
+            max_keys = [k for k, v in visit_counts.items() if v == max_value]
+
+            chosen_key = choice(max_keys)
+            node = node.children[chosen_key]
+            action = UniversalAction(chosen_key)
+            self.env.execute_action(action)
+
+            if visit_counts[chosen_key] == 0:
+                return node
+
+        if self.expand_node(node):
+            node: Node = choice(list(node.children.values()))
+            self.env.execute_action(node.previous_action)
+
+        return node
+
+    def expand_node(self, node: Node) -> bool:
+        """
+        Generating some or all child states of a parent state, and then connecting the tree node housing the parent state (a.k.a. parent node) to the nodes housing the child states (a.k.a. child nodes).
+        Returns:
+            False if the node is a leaf (game over)
+        """
+        if self.env.check_win_condition():
+            return False
+
+        actions = self.env.get_legal_actions()
+        player = Player.TWO if node.player == Player.ONE else Player.ONE
+        for action in actions:
+            node.children[action] = Node(node.parent, UniversalAction(action), player)
+
+        return True
+
+    def evaluate_leaf(self) -> Player:
+        """
+        Estimating the value of a leaf node in the tree by doing a rollout simulation using the default policy from the leaf node’s state to a final state.
+        """
         # Using rollout or critic
-        pass
+        actions = self.env.get_legal_actions()
 
-    def backprop(self) -> None:
-        pass
+        while not self.env.check_win_condition():
+            action = choice(actions)
+            self.env.execute_action(UniversalAction(action))
+            actions.remove(action)
 
+        return self.env.winner
 
-class Node:
+    @staticmethod
+    def backprop(node: Node, player: Player, winner: Player) -> None:
+        """
+        Passing the evaluation of a final state back up the tree, updating relevant data at all nodes and edges on the path from the final state to the tree root.
+        """
 
-    def __init__(self, actions: list, player: Player) -> None:
-        # Key: action, value: (N, Q)
-        self.actions = {action: (0, 0) for action in actions}
-        self.N = 0
-        self.previous_action = None
-        self.player = player
+        reinforcement = 0 if winner == player else 1
 
-    def update(self, value):
-        self.N += 1
-        self.actions[self.previous_action][0] += 1
-
-        prev_N, prev_Q = self.actions[self.previous_action]
-
-        self.actions[self.previous_action][1] += (value - prev_Q) / prev_N
-
-    def set_previous_action(self, action: UniversalAction):
-        self.previous_action = action
-
-    def compute_uct(self, action: UniversalAction, exploitation_factor: float):
-        N, Q = self.actions[action]
-        exploitation_factor *= -1 if self.player == Player.TWO else 1
-
-        utc = exploitation_factor * np.sqrt(np.log(self.N if self.N > 0 else 1) / (N + 1))
-        return utc + Q
+        while node is not None:
+            node.visit_count += 1
+            node.Q_value += reinforcement
+            node = node.parent
+            reinforcement = 0 if reinforcement == 1 else 1
