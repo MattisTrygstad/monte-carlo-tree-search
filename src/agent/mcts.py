@@ -16,7 +16,14 @@ class MonteCarloTree:
     def __init__(self, player: Player, state: UniversalState) -> None:
         self.root = Node(None, None, player)
         self.init_state = state
-        self.env = HexagonalGrid(self.init_state)
+        self.env = HexagonalGrid(self.init_state, False)
+
+    def set_root(self, action: UniversalAction, state: UniversalState):
+        self.init_state = state
+        self.env.reset(state)
+
+        # TODO: discard unused children in tree
+        self.root = self.root.children[action.action]
 
     @staticmethod
     def get_children_visit_count(node: Node) -> dict:
@@ -32,7 +39,7 @@ class MonteCarloTree:
 
         self.backprop(node, player, winner)
 
-    def tree_search(self) -> Tuple[Node, HexagonalGrid]:
+    def tree_search(self) -> Node:
         """
         Traversing the tree from the root to a leaf node by using the tree policy.
         """
@@ -65,10 +72,10 @@ class MonteCarloTree:
         Returns:
             False if the node is a leaf (game over)
         """
-        if self.env.check_win_condition():
+        actions = self.env.get_legal_actions()
+        if self.env.check_win_condition() or len(actions) == 0:
             return False
 
-        actions = self.env.get_legal_actions()
         player = Player.TWO if node.player == Player.ONE else Player.ONE
         for action in actions:
             node.children[action] = Node(node.parent, UniversalAction(action), player)

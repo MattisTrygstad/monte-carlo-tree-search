@@ -12,14 +12,15 @@ from environment.hexagonal_grid_state import HexagonalGridState
 from environment.universal_action import UniversalAction
 from environment.universal_state import UniversalState
 
-from utils.config_parser import Config
-
 
 class HexagonalGrid(Environment):
 
-    def __init__(self, state: UniversalState = None):
+    def __init__(self, state: UniversalState = None, visual: bool = False):
         self.history = []
-        self.fig, self.ax = plt.subplots(figsize=(7, 8))
+
+        self.visual = visual
+        if visual:
+            self.fig, self.ax = plt.subplots(figsize=(7, 8))
 
         self.reset(state)
 
@@ -115,6 +116,7 @@ class HexagonalGrid(Environment):
         self.G.add_edges_from(self.state.edges, color='black', weight=1)
 
     def visualize(self, block: bool, delay: int = None) -> None:
+
         plt.cla()
         empty_nodes = self.state.get_empty_nodes()
         player_one_nodes = self.state.get_player_one_nodes()
