@@ -89,7 +89,7 @@ class MonteCarloTree:
         # Using rollout or critic
         actions = self.env.get_legal_actions()
 
-        while not self.env.check_win_condition():
+        while not self.env.check_win_condition() and actions:
             action = choice(actions)
             self.env.execute_action(UniversalAction(action))
             actions.remove(action)

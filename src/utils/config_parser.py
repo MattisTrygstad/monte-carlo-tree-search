@@ -20,7 +20,7 @@ class Config:
     exploitation_factor = float(config.get('LEARNING', 'exploitation_factor'))
     simulations = int(config.get('LEARNING', 'simulations'))
     episodes = int(config.get('LEARNING', 'episodes'))
-    test_episodes = int(config.get('LEARNING', 'test_episodes'))
+    epochs = int(config.get('LEARNING', 'epochs'))
     nn_dimentions = list(ast.literal_eval(config.get('LEARNING', 'nn_dimentions')))
     nn_activation_functions = list(ast.literal_eval(config.get('LEARNING', 'nn_activation_functions')))
     actor_learning_rate = float(config.get('LEARNING', 'actor_learning_rate'))

@@ -1,27 +1,75 @@
 
-import random
-from typing import Tuple
+from random import choice
+import numpy as np
+import torch
+import torch.nn as nn
+from environment.hexagonal_grid import HexagonalGrid
 from environment.universal_action import UniversalAction
 from environment.universal_state import UniversalState
-# from tensorflow.keras import Input
-# from tensorflow.keras.layers import Dense
-# from tensorflow.keras.models import Sequential
 
 
-class Actor:
-    def __init__(self, learning_rate: float, save_interval: int, input_neurons: int, nn_dimensions: list, activation_functions: list) -> None:
+class Actor(nn.Module):
+    def __init__(self, epochs: int, learning_rate: float, save_interval: int, input_neurons: int, nn_dimensions: list, activation_functions: list) -> None:
+        super(Actor, self).__init__()
+        self.epochs = epochs
         self.learning_rate = learning_rate
         self.save_interval = save_interval
 
-        self.replay_buffer = []  # [(PID, input, target),...]
+        network_config = [nn.Linear(input_neurons, nn_dimensions[0])]
+        network_config.append(nn.Dropout(0.5))
+        network_config.append(nn.ReLU())
+        for layer_index in range(len(nn_dimensions) - 1):
+            network_config.append(nn.Linear(nn_dimensions[layer_index], nn_dimensions[layer_index + 1]))
 
-        """ self.model = Sequential()
-        self.model.add(Input(input_neurons))
+        network_config.append(nn.Linear(nn_dimensions[-2], nn_dimensions[-1]))
+        network_config.append(nn.Softmax(-1))
 
-        for x in range(nn_dimensions):
-            self.model.add(Dense(nn_dimensions[x], activation_functions[x]))
-        
-        self.model.add(Dense(1)) """
+        self.model = nn.Sequential(*network_config)
+        self.optimizer = torch.optim.Adagrad(list(self.model.parameters()), lr=self.learning_rate)
+        self.loss_function = nn.BCELoss(reduction='mean')
 
-    def generate_action(self, state: UniversalState, legal_actions: list, epsilon: float) -> UniversalAction:
-        pass
+    def generate_action(self, state: UniversalState, legal_actions: list) -> UniversalAction:
+        input = Actor.__to_tensor(state.to_numpy())
+
+        prediction = self.forward(input).data.numpy()
+
+        all_nodes = state.nodes.keys()
+
+        nodes = [1 if node in legal_actions else 0 for node in all_nodes]
+
+        for node_index in range(nodes):
+            nodes[node_index] *= prediction[node_index]
+
+        nodes /= sum(nodes)
+
+        random_action = choice(list(enumerate(nodes)))[0]
+        greedy_action = np.argmax(nodes)
+
+        return nodes, random_action, greedy_action
+
+    def train(self, input: np.ndarray, target: np.ndarray) -> tuple:
+        x_train = Actor.__to_tensor(input)
+        y_train = Actor.__to_tensor(target)
+
+        for epoch_index in range(self.epochs):
+            prediction = self.model(x_train)
+            loss = self.loss_function(prediction, y_train)
+            self.optimizer.zero_grad()
+            loss.backward()
+            self.optimizer.step()
+
+        accuracy = prediction.argmax(dim=1).eq(y_train(dim=1)).sum().numpy() / len(y_train)
+
+        return loss.item(), accuracy
+
+    def save_model(self, iterations: int) -> None:
+        print(f'Saved model ANET_{iterations}')
+        torch.save(self.state_dict(), f'../models/ANET_{iterations}')
+
+    def load_model(self, iterations: int):
+        print(f'Loaded model ANET_{iterations}')
+        self.load_state_dict(torch.load(f'../models/ANET_{iterations}'))
+
+    @staticmethod
+    def __to_tensor(data):
+        return torch.FloatTensor(data)

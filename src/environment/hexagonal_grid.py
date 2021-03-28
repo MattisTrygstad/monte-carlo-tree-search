@@ -103,10 +103,7 @@ class HexagonalGrid(Environment):
         return False
 
     def get_state(self) -> UniversalState:
-        universal_state = UniversalState()
-        universal_state.nodes = deepcopy(self.state.nodes)
-
-        return universal_state
+        return UniversalState(deepcopy(self.state.nodes), self.get_player_turn())
 
     def reset(self, state: UniversalState = None) -> None:
         self.state = HexagonalGridState(state)
