@@ -15,15 +15,17 @@ from environment.universal_state import UniversalState
 
 class MonteCarloTree:
 
-    def __init__(self, player: Player, state: UniversalState, actor: Actor) -> None:
-        self.root = Node(None, None, player)
+    def __init__(self, state: UniversalState, actor: Actor) -> None:
+        self.root = Node(None, None, Player.ONE)
         self.init_state = state
         self.env = HexagonalGrid(self.init_state, False)
 
-        self.tree_nodes = {}  # key: (player, state), value: Node()
-        self.tree_nodes[player.value, str(state)] = self.root
-
         self.actor = actor
+
+    def reset(self, state: UniversalState):
+        self.env.reset()
+        self.init_state = state
+        self.root = Node(None, None, Player.ONE)
 
     def set_root(self, action: UniversalAction, state: UniversalState):
         self.init_state = state
@@ -48,7 +50,7 @@ class MonteCarloTree:
         Traversing the tree from the root to a leaf node by using the tree policy.
         """
         node = self.root
-        self.env.reset(self.init_state)
+        self.env.reset(UniversalState(deepcopy(self.init_state.nodes)))
 
         while len(node.children) != 0:
             visit_counts = self.get_children_visit_count(node)
@@ -83,8 +85,6 @@ class MonteCarloTree:
         player = Player.TWO if node.player == Player.ONE else Player.ONE
         for action in actions:
             node.children[action] = Node(node.parent, UniversalAction(action), player)
-            state = UniversalState(deepcopy(self.env.state.nodes), player)
-            self.tree_nodes[player.value, str(state)] = node.children[action]
 
         return True
 

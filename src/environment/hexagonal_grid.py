@@ -33,6 +33,9 @@ class HexagonalGrid(Environment):
         return Player.TWO if self.game_counter % 2 == 0 else Player.ONE
 
     def execute_action(self, action: UniversalAction) -> int:
+
+        assert action.coordinates in self.get_legal_actions()
+
         self.history.append(deepcopy(self.state.nodes))
 
         node_pos = action.coordinates

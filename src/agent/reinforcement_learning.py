@@ -30,13 +30,13 @@ class ReinforcementLearning:
     def train(self):
         env = HexagonalGrid(visual=True)
 
-        env.reset()
-
         init_state = UniversalState(deepcopy(env.state.nodes), env.get_player_turn())
-        tree = MonteCarloTree(env.get_player_turn(), init_state, self.actor)
+        tree = MonteCarloTree(deepcopy(init_state), self.actor)
 
         for game_index in range(self.games):
-
+            env.reset()
+            tree.reset(deepcopy(init_state))
+            print(game_index)
             while True:
                 # Check win condition
                 if env.check_win_condition():
@@ -55,6 +55,10 @@ class ReinforcementLearning:
                 env.execute_action(action)
 
                 tree.set_root(action, UniversalState(deepcopy(env.state.nodes), env.get_player_turn()))
+
+                # Visualize last game
+                if game_index == self.games - 1:
+                    env.visualize(False, 1)
 
             self.train_actor(game_index)
 

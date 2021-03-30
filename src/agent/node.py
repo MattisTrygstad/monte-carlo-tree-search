@@ -15,10 +15,11 @@ class Node:
         self.visit_count = 0
         self.Q_value = 0
 
-    def compute_uct(self, exploitation_factor: float) -> float:
+    """ def compute_uct(self, exploitation_factor: float) -> float:
         exploitation_factor *= -1 if self.player == Player.TWO else 1
 
         if self.visit_count == 0:
             return 0 if exploitation_factor == 0 else math.inf
         else:
             return self.Q_value / self.visit_count + exploitation_factor * math.sqrt(2 * math.log(self.parent.visit_count) / self.visit_count)
+ """
