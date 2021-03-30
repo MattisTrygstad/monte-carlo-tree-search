@@ -34,7 +34,7 @@ class ReinforcementLearning:
         env.reset()
 
         init_state = UniversalState(deepcopy(env.state.nodes), env.get_player_turn())
-        tree = MonteCarloTree(env.get_player_turn(), init_state)
+        tree = MonteCarloTree(env.get_player_turn(), init_state, self.actor)
 
         for game_index in range(self.games):
 

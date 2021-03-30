@@ -35,7 +35,7 @@ class HexagonalGrid(Environment):
     def execute_action(self, action: UniversalAction) -> int:
         self.history.append(deepcopy(self.state.nodes))
 
-        node_pos = action.action
+        node_pos = action.coordinates
 
         player = self.get_player_turn()
 

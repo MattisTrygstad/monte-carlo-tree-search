@@ -2,8 +2,10 @@
 
 from copy import deepcopy
 from random import choice, choices
+import random
 from typing import Tuple
 import numpy as np
+from agent.actor import Actor
 from agent.node import Node
 from enums import Player
 from environment.hexagonal_grid import HexagonalGrid
@@ -13,7 +15,7 @@ from environment.universal_state import UniversalState
 
 class MonteCarloTree:
 
-    def __init__(self, player: Player, state: UniversalState) -> None:
+    def __init__(self, player: Player, state: UniversalState, actor: Actor) -> None:
         self.root = Node(None, None, player)
         self.init_state = state
         self.env = HexagonalGrid(self.init_state, False)
@@ -21,12 +23,14 @@ class MonteCarloTree:
         self.tree_nodes = {}  # key: (player, state), value: Node()
         self.tree_nodes[player.value, str(state)] = self.root
 
+        self.actor = actor
+
     def set_root(self, action: UniversalAction, state: UniversalState):
         self.init_state = state
         self.env.reset(state)
 
         # TODO: discard unused children in tree
-        self.root = self.root.children[action.action]
+        self.root = self.root.children[action.coordinates]
 
     @staticmethod
     def get_children_visit_count(node: Node) -> dict:
@@ -87,7 +91,7 @@ class MonteCarloTree:
 
         return True
 
-    def evaluate_leaf(self) -> Player:
+    def evaluate_leaf(self, epsilon: float = 0.5) -> Player:
         """
         Estimating the value of a leaf node in the tree by doing a rollout simulation using the default policy from the leaf node’s state to a final state.
         """
@@ -95,9 +99,13 @@ class MonteCarloTree:
         actions = self.env.get_legal_actions()
 
         while not self.env.check_win_condition() and actions:
-            action = choice(actions)
-            self.env.execute_action(UniversalAction(action))
-            actions.remove(action)
+            if random.uniform(0, 1) < epsilon:
+                action = UniversalAction(choice(actions))
+            else:
+                state = UniversalState(deepcopy(self.env.state.nodes), self.env.get_player_turn())
+                action = self.actor.generate_action(state, actions)
+            self.env.execute_action(action)
+            actions.remove(action.coordinates)
 
         return self.env.winner
 

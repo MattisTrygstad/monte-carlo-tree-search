@@ -1,4 +1,5 @@
 
+from math import sqrt
 from random import choice
 import sys
 import numpy as np
@@ -38,21 +39,26 @@ class Actor(nn.Module):
     def generate_action(self, state: UniversalState, legal_actions: list) -> UniversalAction:
         input = Actor.__to_tensor(state.to_numpy())
 
-        prediction = self.forward(input).data.numpy()
+        prediction = self.inference(input).data.numpy()
 
         all_nodes = state.nodes.keys()
 
         nodes = [1 if node in legal_actions else 0 for node in all_nodes]
 
-        for node_index in range(nodes):
+        for node_index in range(len(nodes)):
             nodes[node_index] *= prediction[node_index]
 
         nodes /= sum(nodes)
 
-        random_action = choice(list(enumerate(nodes)))[0]
-        greedy_action = np.argmax(nodes)
+        #random_index = choice(list(enumerate(nodes)))[0]
+        #random_action = UniversalAction((random_index // size, random_index % size))
 
-        return nodes, random_action, greedy_action
+        greedy_index = np.argmax(nodes)
+
+        size = sqrt(len(all_nodes))
+        action = UniversalAction((greedy_index // size, greedy_index % size))
+
+        return action
 
     def train(self, input: np.ndarray, target: np.ndarray) -> tuple:
         x_train = Actor.__to_tensor(input)
@@ -68,6 +74,10 @@ class Actor(nn.Module):
         accuracy = prediction.argmax(dim=1).eq(y_train.argmax(dim=1)).sum().numpy() / len(y_train)
 
         return loss.item(), accuracy
+
+    def inference(self, input):
+        with torch.no_grad():
+            return self.model(input)
 
     def save_model(self, iterations: int) -> None:
         print(f'Saved model ANET_{iterations}')

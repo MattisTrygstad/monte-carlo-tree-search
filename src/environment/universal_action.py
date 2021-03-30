@@ -5,7 +5,7 @@ class UniversalAction():
 
     def __init__(self, action: tuple = None) -> None:
         super().__init__()
-        self.action = action if action else ()
+        self.coordinates = action if action else ()
 
     def __str__(self) -> str:
-        return str(self.action)
+        return str(self.coordinates)

@@ -48,7 +48,7 @@ def normal_game():
             continue
 
         action = UniversalAction()
-        action.action = node
+        action.coordinates = node
         env.execute_action(action)
         env.visualize(False)
 
