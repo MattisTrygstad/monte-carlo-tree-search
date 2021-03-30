@@ -18,6 +18,9 @@ class MonteCarloTree:
         self.init_state = state
         self.env = HexagonalGrid(self.init_state, False)
 
+        self.tree_nodes = {}  # key: (player, state), value: Node()
+        self.tree_nodes[player.value, str(state)] = self.root
+
     def set_root(self, action: UniversalAction, state: UniversalState):
         self.init_state = state
         self.env.reset(state)
@@ -79,6 +82,8 @@ class MonteCarloTree:
         player = Player.TWO if node.player == Player.ONE else Player.ONE
         for action in actions:
             node.children[action] = Node(node.parent, UniversalAction(action), player)
+            state = UniversalState(deepcopy(self.env.state.nodes), player)
+            self.tree_nodes[player.value, str(state)] = node.children[action]
 
         return True
 

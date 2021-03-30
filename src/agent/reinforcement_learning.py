@@ -3,6 +3,8 @@
 from copy import deepcopy
 from random import sample
 import sys
+
+import numpy as np
 from agent.actor import Actor
 from agent.mcts import MonteCarloTree
 from environment.hexagonal_grid import HexagonalGrid
@@ -65,7 +67,19 @@ class ReinforcementLearning:
         self.actor.save_model(0)
 
     def append_replay_buffer(self, state: UniversalState, visit_counts: dict) -> None:
-        self.replay_buffer.append((state.to_numpy(), visit_counts))
+
+        for (row, col) in state.nodes.keys():
+            if (row, col) in visit_counts.keys():
+                continue
+            visit_counts[(row, col)] = 0
+
+        input = state.to_numpy()
+
+        visit_count_list = np.asarray(list(visit_counts.values()))
+        target = visit_count_list / np.sum(visit_count_list)
+
+        print(input, target)
+        self.replay_buffer.append((input, target))
 
     def train_actor(self, game_index: int):
         batch_size = len(self.replay_buffer) // 2

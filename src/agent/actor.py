@@ -1,5 +1,6 @@
 
 from random import choice
+import sys
 import numpy as np
 import torch
 import torch.nn as nn
@@ -15,15 +16,21 @@ class Actor(nn.Module):
         self.learning_rate = learning_rate
         self.save_interval = save_interval
 
+        # Input layer
         network_config = [nn.Linear(input_neurons, nn_dimensions[0])]
+        print(input_neurons, nn_dimensions[0])
         network_config.append(nn.Dropout(0.5))
         network_config.append(nn.ReLU())
-        for layer_index in range(len(nn_dimensions) - 1):
+
+        # Hidden layers
+        for layer_index in range(len(nn_dimensions) - 2):
+            print(nn_dimensions[layer_index], nn_dimensions[layer_index + 1])
             network_config.append(nn.Linear(nn_dimensions[layer_index], nn_dimensions[layer_index + 1]))
 
+        # Output layer
+        print(nn_dimensions[-2], nn_dimensions[-1])
         network_config.append(nn.Linear(nn_dimensions[-2], nn_dimensions[-1]))
         network_config.append(nn.Softmax(-1))
-
         self.model = nn.Sequential(*network_config)
         self.optimizer = torch.optim.Adagrad(list(self.model.parameters()), lr=self.learning_rate)
         self.loss_function = nn.BCELoss(reduction='mean')
@@ -58,7 +65,7 @@ class Actor(nn.Module):
             loss.backward()
             self.optimizer.step()
 
-        accuracy = prediction.argmax(dim=1).eq(y_train(dim=1)).sum().numpy() / len(y_train)
+        accuracy = prediction.argmax(dim=1).eq(y_train.argmax(dim=1)).sum().numpy() / len(y_train)
 
         return loss.item(), accuracy
 
