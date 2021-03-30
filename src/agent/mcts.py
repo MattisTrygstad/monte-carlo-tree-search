@@ -15,11 +15,11 @@ from environment.universal_state import UniversalState
 
 class MonteCarloTree:
 
-    def __init__(self, state: UniversalState, actor: Actor) -> None:
+    def __init__(self, state: UniversalState, actor: Actor, epsilon: float) -> None:
         self.root = Node(None, None, Player.ONE)
         self.init_state = state
         self.env = HexagonalGrid(self.init_state, False)
-
+        self.epsilon = epsilon
         self.actor = actor
 
     def reset(self, state: UniversalState):
@@ -88,7 +88,7 @@ class MonteCarloTree:
 
         return True
 
-    def evaluate_leaf(self, epsilon: float = 0.5) -> Player:
+    def evaluate_leaf(self) -> Player:
         """
         Estimating the value of a leaf node in the tree by doing a rollout simulation using the default policy from the leaf node’s state to a final state.
         """
@@ -96,7 +96,7 @@ class MonteCarloTree:
         actions = self.env.get_legal_actions()
 
         while not self.env.check_win_condition() and actions:
-            if random.uniform(0, 1) < epsilon:
+            if random.uniform(0, 1) < self.epsilon:
                 action = UniversalAction(choice(actions))
             else:
                 state = UniversalState(deepcopy(self.env.state.nodes), self.env.get_player_turn())

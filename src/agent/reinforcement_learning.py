@@ -14,11 +14,13 @@ from utils.visualize_training import visualize_training
 
 class ReinforcementLearning:
 
-    def __init__(self, games: int, simulations: int, epochs: int, save_interval: int, learning_rate: float, input_size: int, nn_dimensions: list, activation_functions: list) -> None:
+    def __init__(self, games: int, simulations: int, epochs: int, save_interval: int, epsilon: float, epsilon_decay: float, learning_rate: float, input_size: int, nn_dimensions: list, activation_functions: list) -> None:
         self.games = games
         self.simulations = simulations
         self.epochs = epochs
         self.learning_rate = learning_rate
+        self.epsilon = epsilon
+        self.epsilon_decay = epsilon_decay
         self.save_interval = save_interval
 
         self.actor = Actor(self.epochs, self.learning_rate, self.save_interval, input_size, nn_dimensions, activation_functions)
@@ -31,12 +33,12 @@ class ReinforcementLearning:
         env = HexagonalGrid(visual=True)
 
         init_state = UniversalState(deepcopy(env.state.nodes), env.get_player_turn())
-        tree = MonteCarloTree(deepcopy(init_state), self.actor)
+        tree = MonteCarloTree(deepcopy(init_state), self.actor, self.epsilon)
 
         for game_index in range(self.games):
             env.reset()
             tree.reset(deepcopy(init_state))
-            print(game_index)
+            print(game_index, round(tree.epsilon, 3))
             while True:
                 # Check win condition
                 if env.check_win_condition():
@@ -57,10 +59,11 @@ class ReinforcementLearning:
                 tree.set_root(action, UniversalState(deepcopy(env.state.nodes), env.get_player_turn()))
 
                 # Visualize last game
-                if game_index == self.games - 1:
-                    env.visualize(False, 1)
+                # if game_index == self.games - 1:
+                #     env.visualize(False, 1)
 
             self.train_actor(game_index)
+            tree.epsilon *= self.epsilon_decay
 
         self.actor.save_model(0)
 

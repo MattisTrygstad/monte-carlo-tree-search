@@ -50,9 +50,6 @@ class Actor(nn.Module):
 
         nodes /= sum(nodes)
 
-        #random_index = choice(list(enumerate(nodes)))[0]
-        #random_action = UniversalAction((random_index // size, random_index % size))
-
         greedy_index = np.argmax(nodes)
 
         size = sqrt(len(all_nodes))

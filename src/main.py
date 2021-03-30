@@ -6,7 +6,7 @@ from utils.normal_game import normal_game
 
 
 def main():
-    rl = ReinforcementLearning(Config.episodes, Config.simulations, Config.epochs, Config.save_interval, Config.actor_learning_rate, Config.board_size**2 + 1, Config.nn_dimentions, Config.nn_activation_functions)
+    rl = ReinforcementLearning(Config.episodes, Config.simulations, Config.epochs, Config.save_interval, Config.epsilon, Config.epsilon_decay, Config.actor_learning_rate, Config.board_size**2 + 1, Config.nn_dimentions, Config.nn_activation_functions)
 
     rl.train()
 
