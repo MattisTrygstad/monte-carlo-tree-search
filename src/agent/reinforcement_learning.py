@@ -2,7 +2,6 @@
 
 from copy import deepcopy
 from random import sample
-import sys
 
 import numpy as np
 from agent.actor import Actor
@@ -38,7 +37,6 @@ class ReinforcementLearning:
 
         for game_index in range(self.games):
 
-            counter = 0
             while True:
                 # Check win condition
                 if env.check_win_condition():
@@ -50,18 +48,13 @@ class ReinforcementLearning:
                     tree.single_pass()
 
                 visit_counts = tree.get_children_visit_count(tree.root)
-
                 self.append_replay_buffer(UniversalState(deepcopy(env.state.nodes), env.get_player_turn()), visit_counts)
 
                 chosen_key = max(visit_counts, key=visit_counts.get)
-
                 action = UniversalAction(chosen_key)
-
                 env.execute_action(action)
 
                 tree.set_root(action, UniversalState(deepcopy(env.state.nodes), env.get_player_turn()))
-
-                counter += 1
 
             self.train_actor(game_index)
 

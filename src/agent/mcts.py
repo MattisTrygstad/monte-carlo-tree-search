@@ -38,12 +38,9 @@ class MonteCarloTree:
         return {key: child.visit_count for key, child in node.children.items()}
 
     def single_pass(self) -> None:
-
         node = self.tree_search()
         player = self.env.get_player_turn()
-
         winner = self.evaluate_leaf()
-
         self.backprop(node, player, winner)
 
     def tree_search(self) -> Node:
