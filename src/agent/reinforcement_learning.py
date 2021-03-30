@@ -10,6 +10,7 @@ from agent.mcts import MonteCarloTree
 from environment.hexagonal_grid import HexagonalGrid
 from environment.universal_action import UniversalAction
 from environment.universal_state import UniversalState
+from utils.visualize_training import visualize_training
 
 
 class ReinforcementLearning:
@@ -41,8 +42,8 @@ class ReinforcementLearning:
             while True:
                 # Check win condition
                 if env.check_win_condition():
-                    print(counter)
-                    env.visualize(False, 10)
+                    # print(counter)
+                    #env.visualize(False, 10)
                     break
 
                 for _ in range(self.simulations):
@@ -66,6 +67,8 @@ class ReinforcementLearning:
 
         self.actor.save_model(0)
 
+        visualize_training(self.losses, self.accuracies)
+
     def append_replay_buffer(self, state: UniversalState, visit_counts: dict) -> None:
 
         for (row, col) in state.nodes.keys():
@@ -78,7 +81,7 @@ class ReinforcementLearning:
         visit_count_list = np.asarray(list(visit_counts.values()))
         target = visit_count_list / np.sum(visit_count_list)
 
-        print(input, target)
+        #print(input, target)
         self.replay_buffer.append((input, target))
 
     def train_actor(self, game_index: int):
