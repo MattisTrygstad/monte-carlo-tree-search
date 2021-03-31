@@ -38,10 +38,6 @@ class HexagonalGridState(UniversalState):
                 self.nodes[(x, y)] = NodeState.EMPTY.value
                 self.node_names[(x, y)] = f'{x},{y}'
 
-        # Set filled nodes
-        for (row, col) in Config.filled_nodes:
-            self.nodes[(row, col)] = NodeState.PLAYER_1.value
-
     def __generate_edges(self) -> None:
         for (row, col) in self.nodes.keys():
             for (x, y) in self.neighbors:

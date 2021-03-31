@@ -8,33 +8,37 @@ import torch.nn as nn
 from environment.hexagonal_grid import HexagonalGrid
 from environment.universal_action import UniversalAction
 from environment.universal_state import UniversalState
+from utils.instantiate import instantiate_activation_func, instantiate_optimizer
 
 
 class Actor(nn.Module):
-    def __init__(self, epochs: int, learning_rate: float, save_interval: int, input_neurons: int, nn_dimensions: list, activation_functions: list) -> None:
+    def __init__(self, epochs: int, learning_rate: float, save_interval: int, board_size: int, nn_dimensions: list, activation_functions: list, optimizer: str) -> None:
         super(Actor, self).__init__()
         self.epochs = epochs
         self.learning_rate = learning_rate
         self.save_interval = save_interval
 
         # Input layer
-        network_config = [nn.Linear(input_neurons, nn_dimensions[0])]
-        print(input_neurons, nn_dimensions[0])
+        network_config = [nn.Linear(board_size**2 + 1, nn_dimensions[0])]
         network_config.append(nn.Dropout(0.5))
-        network_config.append(nn.ReLU())
+        activation_function = instantiate_activation_func(activation_functions[0])
+        network_config.append(activation_function) if activation_function else None
 
         # Hidden layers
-        for layer_index in range(len(nn_dimensions) - 2):
-            print(nn_dimensions[layer_index], nn_dimensions[layer_index + 1])
+        for layer_index in range(len(nn_dimensions) - 1):
             network_config.append(nn.Linear(nn_dimensions[layer_index], nn_dimensions[layer_index + 1]))
 
+            activation_function = instantiate_activation_func(activation_functions[layer_index + 1])
+            network_config.append(activation_function) if activation_function else None
+
         # Output layer
-        print(nn_dimensions[-2], nn_dimensions[-1])
-        network_config.append(nn.Linear(nn_dimensions[-2], nn_dimensions[-1]))
+        network_config.append(nn.Linear(nn_dimensions[-1], board_size**2))
         network_config.append(nn.Softmax(-1))
         self.model = nn.Sequential(*network_config)
-        self.optimizer = torch.optim.Adagrad(list(self.model.parameters()), lr=self.learning_rate)
+        self.optimizer = instantiate_optimizer(optimizer, list(self.model.parameters()), self.learning_rate)
         self.loss_function = nn.BCELoss(reduction='mean')
+
+        print(self.model)
 
     def generate_action(self, state: UniversalState, legal_actions: list) -> UniversalAction:
         input = Actor.__to_tensor(state.to_numpy())

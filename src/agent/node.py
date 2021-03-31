@@ -7,19 +7,21 @@ from environment.universal_state import UniversalState
 
 class Node:
 
-    def __init__(self, parent: 'Node', action: UniversalAction, player: Player) -> None:
+    def __init__(self, parent: 'Node', player: Player) -> None:
         self.parent = parent
-        self.previous_action = action
+        self.cached_action = None
         self.player = player
-        self.children = {}  # Key: node coordinate, value: Node()
+        self.children = {}  # Key: node coordinates, value: Node()
+        self.edges = {}  # Key: node coordinates, value: [traversals, q_value]
         self.visit_count = 0
-        self.Q_value = 0
 
-    """ def compute_uct(self, exploitation_factor: float) -> float:
-        exploitation_factor *= -1 if self.player == Player.TWO else 1
+    def evaluate_action(self, action: tuple, exploration_constant: float) -> float:
+        edge_traversals, q_value = self.edges[action]
+        exploration_constant *= 1 if self.player == Player.ONE else -1
 
-        if self.visit_count == 0:
-            return 0 if exploitation_factor == 0 else math.inf
-        else:
-            return self.Q_value / self.visit_count + exploitation_factor * math.sqrt(2 * math.log(self.parent.visit_count) / self.visit_count)
- """
+        # Avoid log(0)
+        node_traversals = self.visit_count if self.visit_count > 0 else 1
+        return q_value + exploration_constant * np.sqrt(np.log(node_traversals) / (1 + edge_traversals))
+
+    def __str__(self) -> str:
+        return f'cached_action: {self.cached_action}\nplayer: {self.player}\nedges: {len(self.edges)}\nvisit_count: {self.visit_count}\nparent: {True if self.parent else False}'
