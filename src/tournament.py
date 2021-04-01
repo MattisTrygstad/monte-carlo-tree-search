@@ -14,12 +14,12 @@ class Tournament:
         self.agents = []
         self.results = {}  # Key: str(iteraton_num), value: wins
 
-        self.env = HexagonalGrid(visual=False)
+        self.env = HexagonalGrid(visual=True)
         self.load_agents(training_games, save_interval)
 
     def load_agents(self, training_games: int, save_interval: int) -> None:
 
-        number_of_agents = int(training_games // save_interval)
+        number_of_agents = int(training_games // save_interval) + 1
 
         print(number_of_agents)
 
@@ -43,7 +43,7 @@ class Tournament:
                 print(f'Player {p1.iterations} vs. Player {p2.iterations}')
                 scores = [0, 0]
                 for game_index in range(self.games):
-                    winner: Player = self.game(p1, p2)
+                    winner: Player = self.game(game_index, p1, p2)
                     scores[winner.value] += 1
 
                 print(f'Final scores: {scores[0]} - {scores[1]}\n')
@@ -54,7 +54,7 @@ class Tournament:
 
         print(self.results)
 
-    def game(self, p1: Actor, p2: Actor):
+    def game(self, game_index: int, p1: Actor, p2: Actor):
         self.env.reset()
 
         while True:
@@ -73,3 +73,6 @@ class Tournament:
                 action = p2.generate_action(state, actions)
 
             self.env.execute_action(action)
+
+            # if game_index == 0:
+            #     self.env.visualize(False, 1)

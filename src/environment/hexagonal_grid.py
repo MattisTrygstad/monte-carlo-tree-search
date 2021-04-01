@@ -101,8 +101,12 @@ class HexagonalGrid(Environment):
 
     def reset(self, state: UniversalState = None) -> None:
         self.state = HexagonalGridState(state)
-        self.winner = None
-        self.shortest_path = None
+
+        if hasattr(self, 'winner'):
+            del self.winner
+
+        if hasattr(self, 'shortest_path'):
+            del self.shortest_path
 
         if state:
             self.game_counter = 0 if state.player == Player.ONE else 1

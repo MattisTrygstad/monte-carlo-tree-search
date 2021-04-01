@@ -73,7 +73,7 @@ class ReinforcementLearning:
             print_progress(game_index, self.games, length=20, suffix=f'Game: {game_index}/{self.games}, Epsilon: {round(tree.epsilon,5)}, Loss: {round(loss, 5)}, Acc: {round(acc,5)}')
 
         print()
-
+        self.actor.save_model(self.games)
         visualize_training(self.losses, self.accuracies)
 
     def append_replay_buffer(self, state: UniversalState, distribution: dict) -> None:
