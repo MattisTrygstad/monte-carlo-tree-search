@@ -16,7 +16,7 @@ def main():
         rl = ReinforcementLearning(Config.episodes, Config.simulations, Config.epochs, Config.save_interval, Config.epsilon, Config.epsilon_decay, Config.actor_learning_rate, Config.board_size, Config.nn_dimentions, Config.nn_activation_functions, Config.optimizer, Config.exploration_constant)
         rl.train()
 
-    elif Config.tournament:
+    if Config.tournament:
         tournament = Tournament(Config.tournament_games, Config.episodes, Config.save_interval)
         tournament.run()
 
