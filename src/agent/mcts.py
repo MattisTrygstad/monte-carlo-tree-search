@@ -62,9 +62,10 @@ class MonteCarloTree:
         Traversing the tree from the root to a leaf node by using the tree policy.
         """
         node = self.root
-        self.env.reset(UniversalState(deepcopy(self.init_state.nodes)))
 
-        while len(node.children) != 0 and self.env.check_win_condition():
+        self.env.reset(UniversalState(deepcopy(self.init_state.nodes), self.init_state.player))
+
+        while len(node.children) != 0:
             action = self.tree_policy(node)
             node.cached_action = action
             self.env.execute_action(action)
@@ -74,7 +75,6 @@ class MonteCarloTree:
                 return node
 
         if self.expand_node(node):
-            #node: Node = choice(list(node.children.values()))
             action = self.tree_policy(node)
             node.cached_action = action
             self.env.execute_action(action)
@@ -88,11 +88,12 @@ class MonteCarloTree:
         Returns:
             False if the node is a leaf (game over)
         """
-        actions = self.env.get_legal_actions()
         if self.env.check_win_condition():
             return False
 
         player = Player.TWO if node.player == Player.ONE else Player.ONE
+        actions = self.env.get_legal_actions()
+
         for action in actions:
             node.children[action] = Node(node, player)
             node.edges[action] = [0, 0]

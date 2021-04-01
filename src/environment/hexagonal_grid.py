@@ -111,6 +111,9 @@ class HexagonalGrid(Environment):
     def reset(self, state: UniversalState = None) -> None:
         self.state = HexagonalGridState(state)
 
+        if state:
+            self.game_counter = 0 if state.player == Player.ONE else 1
+
         self.G = nx.Graph()
         self.G.add_nodes_from(self.state.nodes)
         self.G.add_edges_from(self.state.edges, color='black', weight=1)
