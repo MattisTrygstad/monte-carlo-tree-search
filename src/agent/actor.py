@@ -20,7 +20,7 @@ class Actor(nn.Module):
 
         # Input layer
         network_config = [nn.Linear(board_size**2 + 1, nn_dimensions[0])]
-        network_config.append(nn.Dropout(0.5))
+        # network_config.append(nn.Dropout(0.5))
         activation_function = instantiate_activation_func(activation_functions[0])
         network_config.append(activation_function) if activation_function else None
 

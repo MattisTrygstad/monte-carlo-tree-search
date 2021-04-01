@@ -38,11 +38,13 @@ class ReinforcementLearning:
         tree = MonteCarloTree(deepcopy(init_state), self.actor, self.epsilon, self.exploration_constant)
 
         for game_index in range(self.games):
+            if game_index % self.save_interval == 0:
+                self.actor.save_model(game_index)
+
             env.reset()
             tree.reset(deepcopy(init_state))
 
             while True:
-                # Check win condition
                 if env.check_win_condition():
                     #env.visualize(False, 10)
                     break
@@ -68,10 +70,9 @@ class ReinforcementLearning:
 
             loss = 0 if len(self.losses) == 0 else self.losses[-1]
             acc = 0 if len(self.accuracies) == 0 else self.accuracies[-1]
-            print_progress(game_index, self.games, length=20, suffix=f'Epsilon: {round(tree.epsilon,5)}, Loss: {round(loss, 5)}, Acc: {round(acc,5)}')
+            print_progress(game_index, self.games, length=20, suffix=f'Game: {game_index}/{self.games}, Epsilon: {round(tree.epsilon,5)}, Loss: {round(loss, 5)}, Acc: {round(acc,5)}')
 
         print()
-        self.actor.save_model(0)
 
         visualize_training(self.losses, self.accuracies)
 

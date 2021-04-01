@@ -16,14 +16,11 @@ from environment.universal_state import UniversalState
 class HexagonalGrid(Environment):
 
     def __init__(self, state: UniversalState = None, visual: bool = False):
-        self.history = []
-
         self.visual = visual
         if visual:
             self.fig, self.ax = plt.subplots(figsize=(7, 8))
 
         self.reset(state)
-
         self.game_counter = 0
 
     def get_player_turn(self) -> Player:
@@ -36,8 +33,6 @@ class HexagonalGrid(Environment):
 
         assert action.coordinates in self.get_legal_actions()
 
-        self.history.append(deepcopy(self.state.nodes))
-
         node_pos = action.coordinates
 
         player = self.get_player_turn()
@@ -49,10 +44,6 @@ class HexagonalGrid(Environment):
 
         self.game_counter += 1
         return 1
-
-    def undo_action(self) -> None:
-        if self.history:
-            self.state.nodes = self.history.pop()
 
     def get_legal_actions(self) -> list:
         return list(self.state.get_empty_nodes().keys())
@@ -110,6 +101,8 @@ class HexagonalGrid(Environment):
 
     def reset(self, state: UniversalState = None) -> None:
         self.state = HexagonalGridState(state)
+        self.winner = None
+        self.shortest_path = None
 
         if state:
             self.game_counter = 0 if state.player == Player.ONE else 1
@@ -143,16 +136,6 @@ class HexagonalGrid(Environment):
         nx.draw(self.G, pos=node_coordinates, nodelist=player_one_nodes, node_color=Color.PLAYER_1.value, node_size=800, ax=self.ax, labels=node_names, font_color=Color.BACKGROUND.value)
         nx.draw(self.G, pos=node_coordinates, nodelist=player_two_nodes, node_color=Color.PLAYER_2.value, node_size=800, ax=self.ax, labels=node_names, font_color=Color.BACKGROUND.value)
         nx.draw(self.G, pos=node_coordinates, edge_color=colors, width=weights, nodelist=empty_nodes, node_color=Color.EMPTY_NODE.value, node_size=800)
-
-        """ if self.history:
-            nx.draw(self.G, pos=node_coordinates, nodelist=[self.state.start_pos], node_color=Color.RED.value, node_size=1200)
-            nx.draw(self.G, pos=node_coordinates, nodelist=[self.state.start_pos], node_color=Color.LIGHT_BLUE.value, node_size=800)
-            nx.draw(self.G, pos=node_coordinates, nodelist=[self.state.end_pos], node_color=Color.RED.value, node_size=1200)
-            nx.draw(self.G, pos=node_coordinates, nodelist=[self.state.end_pos], node_color=Color.DARK_BLUE.value, node_size=800) """
-
-        """ self.ax.set_axis_on()
-        self.ax.tick_params(left=True, bottom=True, labelleft=True, labelbottom=True)
-        plt.title('Peg Solitaire') """
 
         x1 = 1.2
         x2 = -1.8

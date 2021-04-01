@@ -21,7 +21,7 @@ class Config:
     optimizer = str(ast.literal_eval(config.get('LEARNING', 'optimizer')))
     actor_learning_rate = float(config.get('LEARNING', 'actor_learning_rate'))
     critic_learning_rate = float(config.get('LEARNING', 'critic_learning_rate'))
-    save_interval = float(config.get('LEARNING', 'critic_learning_rate'))
+    save_interval = float(config.get('LEARNING', 'save_interval'))
     exploration_constant = float(config.get('LEARNING', 'exploration_constant'))
     rollout_bias = float(config.get('LEARNING', 'rollout_bias'))
 

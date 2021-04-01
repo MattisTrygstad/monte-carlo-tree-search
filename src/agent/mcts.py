@@ -113,6 +113,9 @@ class MonteCarloTree:
             else:
                 state = UniversalState(deepcopy(self.env.state.nodes), self.env.get_player_turn())
                 action = self.actor.generate_action(state, actions)
+                if action.coordinates not in actions:
+                    print(f'Actor chose an invalid action.\nactions: {actions}\nselected action:{action.coordinates}')
+                    action = UniversalAction(choice(actions))
             self.env.execute_action(action)
             actions.remove(action.coordinates)
 

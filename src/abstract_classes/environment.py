@@ -15,10 +15,6 @@ class Environment(ABC):
         pass
 
     @abstractmethod
-    def undo_action(self) -> None:
-        pass
-
-    @abstractmethod
     def get_legal_actions(self) -> list:
         pass
 
