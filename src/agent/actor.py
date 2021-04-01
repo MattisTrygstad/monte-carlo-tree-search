@@ -38,7 +38,7 @@ class Actor(nn.Module):
         self.optimizer = instantiate_optimizer(optimizer, list(self.model.parameters()), self.learning_rate)
         self.loss_function = nn.BCELoss(reduction='mean')
 
-        print(self.model)
+        # print(self.model)
 
     def generate_action(self, state: UniversalState, legal_actions: list) -> UniversalAction:
         input = Actor.__to_tensor(state.to_numpy())
@@ -81,10 +81,11 @@ class Actor(nn.Module):
             return self.model(input)
 
     def save_model(self, iterations: int) -> None:
-        print(f'Saved model ANET_{iterations}')
+        print(f'\nSaved model ANET_{iterations}')
         torch.save(self.state_dict(), f'../models/ANET_{iterations}')
 
     def load_model(self, iterations: int):
+        self.iterations = str(iterations)
         print(f'Loaded model ANET_{iterations}')
         self.load_state_dict(torch.load(f'../models/ANET_{iterations}'))
 

@@ -7,8 +7,12 @@ class Config:
     config = configparser.ConfigParser()
     config.read('config.ini')
 
+    train = bool(ast.literal_eval(config.get('PROGRAM_FLOW', 'train')))
+    tournament = bool(ast.literal_eval(config.get('PROGRAM_FLOW', 'tournament')))
     human_mode = bool(ast.literal_eval(config.get('PROGRAM_FLOW', 'human_mode')))
     experiments = bool(ast.literal_eval(config.get('PROGRAM_FLOW', 'experiments')))
+
+    tournament_games = int(config.get('TOURNAMENT', 'tournament_games'))
 
     reinforcement = int(config.get('ENVIRONMENT', 'reinforcement'))
     board_size = int(config.get('ENVIRONMENT', 'board_size'))
