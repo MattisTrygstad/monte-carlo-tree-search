@@ -2,8 +2,10 @@
 
 from copy import deepcopy
 from random import sample
+import sys
 
 import numpy as np
+import torch
 from agent.actor import Actor
 from agent.mcts import MonteCarloTree
 from environment.hexagonal_grid import HexagonalGrid
@@ -24,12 +26,15 @@ class ReinforcementLearning:
         self.epsilon_decay = epsilon_decay
         self.save_interval = save_interval
         self.exploration_constant = exploration_constant
+        self.board_size = board_size
 
         self.actor = Actor(self.epochs, self.learning_rate, self.save_interval, board_size, nn_dimensions, activation_functions, optimizer)
         self.replay_buffer = []
 
         self.losses = []
         self.accuracies = []
+
+        self.heuristic_env = HexagonalGrid(visual=False)
 
     def train(self):
         env = HexagonalGrid(visual=True)
@@ -83,10 +88,13 @@ class ReinforcementLearning:
                 continue
             distribution[(row, col)] = 0
 
+        distribution = self.apply_heuristics(distribution, state)
+
         input = state.to_numpy()
 
         visit_count_list = np.asarray(list(distribution.values()))
         target = visit_count_list / np.sum(visit_count_list)
+
         self.replay_buffer.append((input, target))
 
     def train_actor(self, game_index: int):
@@ -100,3 +108,31 @@ class ReinforcementLearning:
 
         self.losses.append(loss)
         self.accuracies.append(accuracy)
+
+    def apply_heuristics(self, distribution: dict, state: UniversalState) -> torch.Tensor:
+        player = state.player
+
+        values = list(state.nodes.values())
+
+        # If first move in game, select center
+        if sum(values) == 0:
+            #print('first move')
+            distribution = dict.fromkeys(distribution.keys(), 0.0)
+            distribution[(self.board_size // 2, self.board_size // 2)] = 1.0
+            return distribution
+
+        # Check for obvious wins in next move
+        for key, value in distribution.items():
+            # If probability is higher than 50%, check if it could be a winning state
+            if value > 0.5:
+                self.heuristic_env.state.nodes = deepcopy(state.nodes)
+
+                self.heuristic_env.state.nodes[key] = player.value + 1
+                self.heuristic_env.state.player = player
+                if self.heuristic_env.check_win_condition():
+                    #print('found winning action')
+                    distribution = dict.fromkeys(distribution.keys(), 0.0)
+                    distribution[key] = 1.0
+                    return distribution
+
+        return distribution
