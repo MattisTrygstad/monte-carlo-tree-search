@@ -96,7 +96,7 @@ class ReinforcementLearning:
 
         x_train, y_train = list(zip(*samples))
 
-        loss, accuracy = self.actor.train(x_train, y_train)
+        loss, accuracy = self.actor.fit(x_train, y_train)
 
         self.losses.append(loss)
         self.accuracies.append(accuracy)
