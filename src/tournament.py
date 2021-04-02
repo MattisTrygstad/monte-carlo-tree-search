@@ -1,5 +1,7 @@
 
 
+from random import choice
+import sys
 from agent.actor import Actor
 from enums import Player
 from environment.hexagonal_grid import HexagonalGrid
@@ -57,6 +59,9 @@ class Tournament:
     def game(self, game_index: int, p1: Actor, p2: Actor):
         self.env.reset()
 
+        start_player = choice(list(Player))
+        end_player = Player.ONE if start_player == Player.TWO else Player.TWO
+
         while True:
             # Check win condition
             if self.env.check_win_condition():
@@ -66,10 +71,10 @@ class Tournament:
             state = self.env.get_state()
             actions = self.env.get_legal_actions()
 
-            if player == Player.ONE:
+            if player == start_player:
                 action = p1.generate_action(state, actions)
 
-            elif player == Player.TWO:
+            elif player == end_player:
                 action = p2.generate_action(state, actions)
 
             self.env.execute_action(action)
