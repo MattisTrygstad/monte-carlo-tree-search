@@ -13,6 +13,7 @@ class Config:
     experiments = bool(ast.literal_eval(config.get('PROGRAM_FLOW', 'experiments')))
 
     tournament_games = int(config.get('TOURNAMENT', 'tournament_games'))
+    visualize = bool(ast.literal_eval(config.get('TOURNAMENT', 'visualize')))
 
     reinforcement = int(config.get('ENVIRONMENT', 'reinforcement'))
     board_size = int(config.get('ENVIRONMENT', 'board_size'))

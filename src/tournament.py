@@ -79,5 +79,5 @@ class Tournament:
 
             self.env.execute_action(action)
 
-            # if game_index == 0:
-            #     self.env.visualize(False, 1)
+            if game_index == 0 and Config.visualize:
+                self.env.visualize(False, 1)
