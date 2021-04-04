@@ -64,6 +64,32 @@ class Actor(nn.Module):
 
         return action
 
+    def generate_probabilistic_action(self, state: UniversalState, legal_actions: list) -> UniversalAction:
+        input = Actor.__to_tensor(state.to_numpy())
+
+        prediction = self.inference(input).data.numpy()
+
+        all_nodes = state.nodes.keys()
+
+        nodes: list = [1 if node in legal_actions else 0 for node in all_nodes]
+
+        for node_index in range(len(nodes)):
+            nodes[node_index] *= prediction[node_index]
+
+        nodes /= sum(nodes)
+
+        nodes = nodes.sort()
+
+        greedy_index = np.argmax(nodes)
+
+        size = sqrt(len(all_nodes))
+        action_coordinates = (greedy_index // size, greedy_index % size)
+
+        assert action_coordinates in legal_actions
+        action = UniversalAction(action_coordinates)
+
+        return action
+
     def fit(self, x_train: np.ndarray, y_train: np.ndarray) -> tuple:
 
         x_train = Actor.__to_tensor(x_train)
@@ -93,6 +119,6 @@ class Actor(nn.Module):
         print(f'Loaded model ANET_{iterations}')
         self.load_state_dict(torch.load(f'../models/ANET_{iterations}'))
 
-    @staticmethod
+    @ staticmethod
     def __to_tensor(data):
         return torch.FloatTensor(data)

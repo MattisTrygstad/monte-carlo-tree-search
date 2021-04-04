@@ -47,7 +47,6 @@ class Actor(nn.Module):
                 neighbors[f] = [t]
         self.neighbors = neighbors
         self.bridge_neighbors = generate_bridge_neighbors(self.board_size, neighbors)
-        print(self.bridge_neighbors)
 
         layers = OrderedDict([
             ('0', nn.ZeroPad2d(2)),
@@ -120,7 +119,6 @@ class Actor(nn.Module):
     def inference_softmax(self, input: np.ndarray, training=False):
         self.train(training)
         x = self.process_data(input)
-        print(x)
         x = self.model(x)
         x = x.reshape(-1, self.board_size**2)
         return F.softmax(x, dim=1)
