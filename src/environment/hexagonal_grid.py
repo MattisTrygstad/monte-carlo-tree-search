@@ -110,6 +110,9 @@ class HexagonalGrid(Environment):
 
         if state:
             self.game_counter = 0 if state.player == Player.ONE else 1
+        else:
+            self.game_counter = 0
+            self.state.player == Player.ONE
 
         self.G = nx.Graph()
         self.G.add_nodes_from(self.state.nodes)

@@ -18,7 +18,7 @@ from environment.universal_state import UniversalState
 class MonteCarloTree:
 
     def __init__(self, state: UniversalState, actor: Actor, epsilon: float, exploration_constant: float) -> None:
-        self.root = Node(None, Player.ONE)
+        self.root = Node(None, state.player)
         self.init_state = state
         self.env = HexagonalGrid(self.init_state, False)
         self.epsilon = epsilon
@@ -28,7 +28,7 @@ class MonteCarloTree:
     def reset(self, state: UniversalState):
         self.env.reset()
         self.init_state = state
-        self.root = Node(None, Player.ONE)
+        self.root = Node(None, state.player)
 
     def set_root(self, action: UniversalAction, state: UniversalState):
         self.init_state = state
@@ -91,6 +91,8 @@ class MonteCarloTree:
         if self.env.check_win_condition():
             return False
 
+        assert node.player == self.env.get_player_turn()
+
         player = Player.TWO if node.player == Player.ONE else Player.ONE
         actions = self.env.get_legal_actions()
 
@@ -127,7 +129,7 @@ class MonteCarloTree:
         Passing the evaluation of a final state back up the tree, updating relevant data at all nodes and edges on the path from the final state to the tree root.
         """
 
-        reinforcement = 1 if winner == Player.ONE else -1
+        reinforcement = 1 if winner == Player.ONE else 0
         counter = 0
         while node is not None:
             counter += 1

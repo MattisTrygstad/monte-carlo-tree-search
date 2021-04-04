@@ -60,6 +60,8 @@ class Tournament:
         self.env.reset()
 
         start_player = choice(list(Player))
+        self.env.state.player = start_player
+        self.env.game_counter = 1 if start_player == Player.TWO else 0
         end_player = Player.ONE if start_player == Player.TWO else Player.TWO
 
         while True:

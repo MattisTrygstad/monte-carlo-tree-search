@@ -57,7 +57,10 @@ class Actor(nn.Module):
         greedy_index = np.argmax(nodes)
 
         size = sqrt(len(all_nodes))
-        action = UniversalAction((greedy_index // size, greedy_index % size))
+        action_coordinates = (greedy_index // size, greedy_index % size)
+
+        assert action_coordinates in legal_actions
+        action = UniversalAction(action_coordinates)
 
         return action
 

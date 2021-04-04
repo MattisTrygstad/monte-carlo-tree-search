@@ -95,10 +95,12 @@ class ReinforcementLearning:
         visit_count_list = np.asarray(list(distribution.values()))
         target = visit_count_list / np.sum(visit_count_list)
 
+        if len(self.replay_buffer) > 800:
+            self.replay_buffer.pop(0)
         self.replay_buffer.append((input, target))
 
     def train_actor(self, game_index: int):
-        batch_size = len(self.replay_buffer) // 2
+        batch_size = min(64, len(self.replay_buffer) // 2)
 
         samples = sample(self.replay_buffer, batch_size)
 
