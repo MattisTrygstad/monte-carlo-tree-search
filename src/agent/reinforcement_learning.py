@@ -17,7 +17,7 @@ from utils.visualize_training import visualize_training
 
 class ReinforcementLearning:
 
-    def __init__(self, games: int, simulations: int, epochs: int, save_interval: int, epsilon: float, epsilon_decay: float, learning_rate: float, board_size: int, nn_dimensions: list, activation_functions: list, optimizer: str, exploration_constant: float) -> None:
+    def __init__(self, games: int, simulations: int, epochs: int, save_interval: int, epsilon: float, learning_rate: float, board_size: int, nn_dimensions: list, activation_functions: list, optimizer: str, exploration_constant: float) -> None:
         self.games = games
         self.simulations = simulations
         self.epochs = epochs
@@ -92,15 +92,20 @@ class ReinforcementLearning:
 
         input = state.to_numpy()
 
-        visit_count_list = np.asarray(list(distribution.values()))
-        target = visit_count_list / np.sum(visit_count_list)
+        target = np.zeros((self.board_size**2,))
+        for (row, col), value in distribution.items():
+            index = row * self.board_size + col
+            target[index] = value
+
+        assert distribution[(1, 3)] == target[7]
+        assert distribution[(3, 3)] == target[15]
 
         if len(self.replay_buffer) > 800:
             self.replay_buffer.pop(0)
         self.replay_buffer.append((input, target))
 
     def train_actor(self, game_index: int):
-        batch_size = min(64, len(self.replay_buffer) // 2)
+        batch_size = min(64, len(self.replay_buffer))
 
         samples = sample(self.replay_buffer, batch_size)
 

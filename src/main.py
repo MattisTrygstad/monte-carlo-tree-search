@@ -13,23 +13,12 @@ from utils.normal_game import normal_game
 def main():
 
     if Config.train:
-        rl = ReinforcementLearning(Config.episodes, Config.simulations, Config.epochs, Config.save_interval, Config.epsilon, Config.epsilon_decay, Config.actor_learning_rate, Config.board_size, Config.nn_dimentions, Config.nn_activation_functions, Config.optimizer, Config.exploration_constant)
+        rl = ReinforcementLearning(Config.episodes, Config.simulations, Config.epochs, Config.save_interval, Config.epsilon, Config.actor_learning_rate, Config.board_size, Config.nn_dimentions, Config.nn_activation_functions, Config.optimizer, Config.exploration_constant)
         rl.train()
 
     if Config.tournament:
         tournament = Tournament(Config.tournament_games, Config.episodes, Config.save_interval)
         tournament.run()
-
-    win_test = False
-    if win_test:
-        nodes = {(0, 0): 2, (0, 1): 1, (0, 2): 1, (0, 3): 1, (1, 0): 2, (1, 1): 1, (1, 2): 2, (1, 3): 2, (2, 0): 2, (2, 1): 2, (2, 2): 1, (2, 3): 1, (3, 0): 2, (3, 1): 1, (3, 2): 2, (3, 3): 1}
-
-        env = HexagonalGrid(UniversalState(nodes, Player.TWO), True)
-
-        print(env.check_win_condition())
-
-        env.visualize(True)
-        sys.exit()
 
     # if Config.human_mode:
     #     normal_game()

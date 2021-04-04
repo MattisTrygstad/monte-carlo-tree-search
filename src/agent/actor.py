@@ -36,6 +36,7 @@ class Actor(nn.Module):
         network_config.append(nn.Linear(nn_dimensions[-1], board_size**2))
         network_config.append(nn.Softmax(-1))
         self.model = nn.Sequential(*network_config)
+        self.model.apply(self.init_weights)
         self.optimizer = instantiate_optimizer(optimizer, list(self.model.parameters()), self.learning_rate)
         self.loss_function = nn.BCELoss(reduction='mean')
 
@@ -90,7 +91,6 @@ class Actor(nn.Module):
         return action
 
     def fit(self, x_train: np.ndarray, y_train: np.ndarray) -> tuple:
-
         x_train = Actor.__to_tensor(x_train)
         y_train = Actor.__to_tensor(y_train)
 
@@ -121,3 +121,8 @@ class Actor(nn.Module):
     @ staticmethod
     def __to_tensor(data):
         return torch.FloatTensor(data)
+
+    @staticmethod
+    def init_weights(m: nn.Module) -> None:
+        if type(m) == nn.Linear:
+            nn.init.xavier_uniform_(m.weight)
