@@ -75,7 +75,7 @@ class ReinforcementLearning:
 
             loss = 0 if len(self.losses) == 0 else self.losses[-1]
             acc = 0 if len(self.accuracies) == 0 else self.accuracies[-1]
-            print_progress(game_index, self.games, length=20, suffix=f'Game: {game_index}/{self.games}, Epsilon: {round(tree.epsilon,2):0.2f}, Loss: {round(loss, 5):0.5f}, Acc: {round(acc,5):0.5f}')
+            print_progress(game_index, self.games, length=20, suffix=f'Game: {game_index+1}/{self.games}, Epsilon: {round(tree.epsilon,2):0.2f}, Loss: {round(loss, 5):0.5f}, Acc: {round(acc,5):0.5f}')
 
         print()
         self.actor.save_model(self.games)

@@ -66,7 +66,7 @@ class Actor(nn.Module):
 
         return action
 
-    def generate_probabilistic_action(self, state: UniversalState, legal_actions: list) -> UniversalAction:
+    """ def generate_probabilistic_action(self, state: UniversalState, legal_actions: list) -> UniversalAction:
         input = Actor.__to_tensor(state.generate_actor_input())
 
         prediction = self.inference(input).data.numpy()
@@ -88,7 +88,7 @@ class Actor(nn.Module):
         assert action_coordinates in legal_actions
         action = UniversalAction(action_coordinates)
 
-        return action
+        return action """
 
     def fit(self, x_train: np.ndarray, y_train: np.ndarray) -> tuple:
         x_train = Actor.__to_tensor(x_train)
