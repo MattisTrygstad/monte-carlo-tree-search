@@ -75,7 +75,7 @@ class MonteCarloTree:
                 return node
 
         if self.expand_node(node):
-            action = self.tree_policy(node)
+            action = UniversalAction(choice(self.env.get_legal_actions()))
             node.cached_action = action
             self.env.execute_action(action)
             node: Node = node.children[action.coordinates]
@@ -129,16 +129,16 @@ class MonteCarloTree:
         Passing the evaluation of a final state back up the tree, updating relevant data at all nodes and edges on the path from the final state to the tree root.
         """
 
-        reinforcement = 1 if winner == Player.ONE else 0
-        counter = 0
-        while node is not None:
-            counter += 1
-            node.visit_count += 1
+        reinforcement = 1 if winner == Player.ONE else -1
 
-            if node.cached_action:
-                action = node.cached_action.coordinates
-                node.edges[action][0] += 1
-                edge_traversals, q_value = node.edges[action]
-                node.edges[action][1] += (reinforcement - q_value) / edge_traversals
+        node.visit_count += 1
+
+        while node.parent:
+            node.parent.visit_count += 1
+
+            action = node.parent.cached_action.coordinates
+            node.parent.edges[action][0] += 1
+            edge_traversals, q_value = node.parent.edges[action]
+            node.parent.edges[action][1] += (reinforcement - q_value) / edge_traversals
 
             node = node.parent
