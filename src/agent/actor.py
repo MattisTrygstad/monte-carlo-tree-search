@@ -1,4 +1,5 @@
 
+from copy import deepcopy
 from math import sqrt
 from random import choice
 import sys
@@ -78,12 +79,10 @@ class Actor(nn.Module):
 
         nodes /= sum(nodes)
 
-        nodes = nodes.sort()
-
-        greedy_index = np.argmax(nodes)
+        index = np.random.choice([x for x in range(len(nodes))], p=nodes)
 
         size = sqrt(len(all_nodes))
-        action_coordinates = (greedy_index // size, greedy_index % size)
+        action_coordinates = (index // size, index % size)
 
         assert action_coordinates in legal_actions
         action = UniversalAction(action_coordinates)

@@ -74,10 +74,10 @@ class Tournament:
             actions = self.env.get_legal_actions()
 
             if player == start_player:
-                action = p1.generate_action(state, actions)
+                action = p1.generate_probabilistic_action(state, actions)
 
             elif player == end_player:
-                action = p2.generate_action(state, actions)
+                action = p2.generate_probabilistic_action(state, actions)
 
             self.env.execute_action(action)
 
