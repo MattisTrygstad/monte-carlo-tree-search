@@ -51,10 +51,17 @@ class MonteCarloTree:
 
     def tree_policy(self, node: Node) -> UniversalAction:
         player = self.env.get_player_turn()
-        actions = list(node.children.keys())
 
-        tree_policy_values = [node.evaluate_action(action, self.exploration_constant) for action in actions]
-        selected_action = actions[np.argmax(tree_policy_values) if player == Player.ONE else np.argmin(tree_policy_values)]
+        assert player == node.player
+
+        tree_policy_values = {}
+        for row, col in node.children.keys():
+            tree_policy_values[(row, col)] = node.evaluate_action((row, col), self.exploration_constant)
+
+        best_action = max(tree_policy_values, key=tree_policy_values.get)
+        worst_action = min(tree_policy_values, key=tree_policy_values.get)
+
+        selected_action = best_action if player == Player.ONE else worst_action
         return UniversalAction(selected_action)
 
     def tree_search(self) -> Node:
@@ -129,7 +136,8 @@ class MonteCarloTree:
         Passing the evaluation of a final state back up the tree, updating relevant data at all nodes and edges on the path from the final state to the tree root.
         """
 
-        reinforcement = 1 if winner == Player.ONE else -1
+        # TODO: -1 or 0 ?
+        reinforcement = 1 if winner == Player.ONE else 0
 
         node.visit_count += 1
 

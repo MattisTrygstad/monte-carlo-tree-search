@@ -43,11 +43,11 @@ class Actor(nn.Module):
         # print(self.model)
 
     def generate_action(self, state: UniversalState, legal_actions: list) -> UniversalAction:
-        input = Actor.__to_tensor(state.to_numpy())
+        input = Actor.__to_tensor(state.generate_actor_input())
 
         prediction = self.inference(input).data.numpy()
 
-        all_nodes = state.nodes.keys()
+        all_nodes = state.ordered_keys()
 
         nodes = [1 if node in legal_actions else 0 for node in all_nodes]
 
@@ -67,7 +67,7 @@ class Actor(nn.Module):
         return action
 
     def generate_probabilistic_action(self, state: UniversalState, legal_actions: list) -> UniversalAction:
-        input = Actor.__to_tensor(state.to_numpy())
+        input = Actor.__to_tensor(state.generate_actor_input())
 
         prediction = self.inference(input).data.numpy()
 
@@ -95,7 +95,8 @@ class Actor(nn.Module):
         y_train = Actor.__to_tensor(y_train)
 
         for epoch_index in range(self.epochs):
-            prediction = self.model(x_train)
+            prediction: torch.Tensor = self.model(x_train)
+            assert np.array(prediction.tolist()).shape == y_train.shape
             loss = self.loss_function(prediction, y_train)
             self.optimizer.zero_grad()
             loss.backward()

@@ -75,7 +75,7 @@ class ReinforcementLearning:
 
             loss = 0 if len(self.losses) == 0 else self.losses[-1]
             acc = 0 if len(self.accuracies) == 0 else self.accuracies[-1]
-            print_progress(game_index, self.games, length=20, suffix=f'Game: {game_index}/{self.games}, Epsilon: {round(tree.epsilon,5)}, Loss: {round(loss, 5)}, Acc: {round(acc,5)}')
+            print_progress(game_index, self.games, length=20, suffix=f'Game: {game_index}/{self.games}, Epsilon: {round(tree.epsilon,2):0.2f}, Loss: {round(loss, 5):0.5f}, Acc: {round(acc,5):0.5f}')
 
         print()
         self.actor.save_model(self.games)
@@ -90,7 +90,7 @@ class ReinforcementLearning:
 
         distribution = self.apply_heuristics(distribution, state)
 
-        input = state.to_numpy()
+        input = state.generate_actor_input()
 
         target = np.zeros((self.board_size**2,))
         for (row, col), value in distribution.items():
