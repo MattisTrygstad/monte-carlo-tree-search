@@ -23,7 +23,7 @@ class ReinforcementLearning:
         self.epochs = epochs
         self.learning_rate = learning_rate
         self.epsilon = epsilon
-        self.epsilon_decay = epsilon_decay
+        self.epsilon_decay = epsilon / self.games
         self.save_interval = save_interval
         self.exploration_constant = exploration_constant
         self.board_size = board_size
@@ -71,7 +71,7 @@ class ReinforcementLearning:
                 #     env.visualize(False, 1)
 
             self.train_actor(game_index)
-            tree.epsilon *= self.epsilon_decay
+            tree.epsilon -= self.epsilon_decay
 
             loss = 0 if len(self.losses) == 0 else self.losses[-1]
             acc = 0 if len(self.accuracies) == 0 else self.accuracies[-1]
