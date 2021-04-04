@@ -7,6 +7,10 @@ from enums import Player
 from environment.hexagonal_grid import HexagonalGrid
 from utils.config_parser import Config
 
+from matplotlib import pyplot as plt
+from matplotlib.pyplot import figure
+import numpy as np
+
 
 class Tournament:
 
@@ -18,6 +22,8 @@ class Tournament:
 
         self.env = HexagonalGrid(visual=True)
         self.load_agents(training_games, save_interval)
+
+        plt.close('all')
 
     def load_agents(self, training_games: int, save_interval: int) -> None:
 
@@ -55,6 +61,7 @@ class Tournament:
                     self.results[p2.iterations] += 1
 
         print(self.results)
+        plot(self.results)
 
     def game(self, game_index: int, p1: Actor, p2: Actor):
         self.env.reset()
@@ -83,3 +90,28 @@ class Tournament:
 
             if game_index == 0 and Config.visualize:
                 self.env.visualize(False, 1)
+
+
+def plot(results: dict):
+
+    figure(num=None, figsize=(12, 6))
+
+    x_axis_labels = []
+    y_axis_values = []
+
+    for key, value in results.items():
+        x_axis_labels.append(key)
+        y_axis_values.append(value)
+
+    y_pos = np.arange(len(x_axis_labels))
+
+    plt.bar(y_pos + 0, y_axis_values, width=0.5, color='c', label='legend title')
+    plt.xticks(y_pos, x_axis_labels)
+    plt.legend(loc='best')
+    plt.ylabel('This is Y-axis label')
+    plt.xlabel('This is X-axis label')
+
+    plt.title("This is the Graph Title")
+
+    # Show the plot
+    plt.show()
