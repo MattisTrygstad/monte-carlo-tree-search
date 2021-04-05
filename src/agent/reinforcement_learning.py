@@ -100,8 +100,8 @@ class ReinforcementLearning:
             index = row * self.board_size + col
             target[index] = value
 
-        assert distribution[(1, 3)] == target[7]
-        assert distribution[(3, 3)] == target[15]
+        #assert distribution[(1, 3)] == target[7]
+        #assert distribution[(3, 3)] == target[15]
 
         if len(self.replay_buffer) > Config.buffer_limit:
             self.replay_buffer.pop(0)
@@ -140,7 +140,7 @@ class ReinforcementLearning:
                 self.heuristic_env.state.nodes[key] = player.value + 1
                 self.heuristic_env.state.player = player
                 if self.heuristic_env.check_win_condition():
-                    #print('found winning action')
+                    print('found winning action')
                     distribution = dict.fromkeys(distribution.keys(), 0.0)
                     distribution[key] = 1.0
                     return distribution

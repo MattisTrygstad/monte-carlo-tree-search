@@ -92,6 +92,8 @@ class Actor(nn.Module):
         for epoch_index in range(self.epochs):
             prediction: torch.Tensor = self.model(x_train)
             assert np.array(prediction.tolist()).shape == y_train.shape
+
+            #print(y_train[0].tolist(), prediction[0].tolist())
             loss = self.loss_function(prediction, y_train)
             self.optimizer.zero_grad()
             loss.backward()

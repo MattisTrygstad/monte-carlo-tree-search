@@ -20,7 +20,7 @@ class UniversalState:
     def generate_actor_input(self):
         state = self.to_numpy()
         array = np.concatenate([np.array([self.player.value]), state])
-        assert array.shape == (17,)
+        #assert array.shape == (17,)
 
         return array
 
@@ -31,8 +31,8 @@ class UniversalState:
             index = row * board_size + col
             state[index] = value
 
-        assert self.nodes[(1, 3)] == state[7]
-        assert self.nodes[(3, 3)] == state[15]
+        #assert self.nodes[(1, 3)] == state[7]
+        #assert self.nodes[(3, 3)] == state[15]
 
         return state
 
@@ -43,7 +43,7 @@ class UniversalState:
             index = row * board_size + col
             state[index] = (row, col)
 
-        assert (1, 3) == state[7]
-        assert (3, 3) == state[15]
+        #assert (1, 3) == state[7]
+        #assert (3, 3) == state[15]
 
         return state

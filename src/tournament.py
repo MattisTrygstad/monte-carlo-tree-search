@@ -23,7 +23,7 @@ class Tournament:
         self.env = HexagonalGrid(visual=True)
         self.load_agents(training_games, save_interval)
 
-        plt.close('all')
+        # plt.close('all')
 
     def load_agents(self, training_games: int, save_interval: int) -> None:
 
@@ -66,7 +66,7 @@ class Tournament:
     def game(self, game_index: int, p1: Actor, p2: Actor):
         self.env.reset()
 
-        start_player = choice(list(Player))
+        start_player = Player.ONE
         self.env.state.player = start_player
         self.env.game_counter = 1 if start_player == Player.TWO else 0
         end_player = Player.ONE if start_player == Player.TWO else Player.TWO
@@ -81,10 +81,10 @@ class Tournament:
             actions = self.env.get_legal_actions()
 
             if player == start_player:
-                action = p1.generate_action(state, actions)
+                action = p1.generate_probabilistic_action(state, actions)
 
             elif player == end_player:
-                action = p2.generate_action(state, actions)
+                action = p2.generate_probabilistic_action(state, actions)
 
             self.env.execute_action(action)
 
