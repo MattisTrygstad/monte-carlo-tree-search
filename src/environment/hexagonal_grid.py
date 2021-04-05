@@ -1,6 +1,7 @@
 
 from copy import deepcopy
 import math
+from random import choice
 import sys
 from matplotlib import pyplot as plt
 import numpy as np
@@ -15,13 +16,16 @@ from environment.universal_state import UniversalState
 
 class HexagonalGrid(Environment):
 
-    def __init__(self, state: UniversalState = None, visual: bool = False):
+    def __init__(self, visual: bool = False):
         self.visual = visual
         if visual:
             self.fig, self.ax = plt.subplots(figsize=(7, 8))
 
-        self.reset(state)
-        self.game_counter = 0
+        self.state = HexagonalGridState()
+
+        self.G = nx.Graph()
+        self.G.add_nodes_from(self.state.nodes)
+        self.G.add_edges_from(self.state.edges, color='black', weight=1)
 
     def get_player_turn(self) -> Player:
         return Player.ONE if self.game_counter % 2 == 0 else Player.TWO
@@ -99,8 +103,7 @@ class HexagonalGrid(Environment):
     def get_state(self) -> UniversalState:
         return UniversalState(deepcopy(self.state.nodes), self.get_player_turn())
 
-    def reset(self, state: UniversalState = None) -> None:
-        self.state = HexagonalGridState(state)
+    def reset(self, state: UniversalState = None, random=False) -> None:
 
         if hasattr(self, 'winner'):
             del self.winner
@@ -109,14 +112,14 @@ class HexagonalGrid(Environment):
             del self.shortest_path
 
         if state:
+            self.state = HexagonalGridState(deepcopy(state))
             self.game_counter = 0 if state.player == Player.ONE else 1
+        elif random:
+            self.state = HexagonalGridState()
+            self.game_counter = choice([0, 1])
         else:
+            print('WARNING: Player 1 always start')
             self.game_counter = 0
-            self.state.player == Player.ONE
-
-        self.G = nx.Graph()
-        self.G.add_nodes_from(self.state.nodes)
-        self.G.add_edges_from(self.state.edges, color='black', weight=1)
 
     def visualize(self, block: bool, delay: int = None) -> None:
 

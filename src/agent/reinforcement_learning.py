@@ -39,33 +39,31 @@ class ReinforcementLearning:
 
     def train(self):
         env = HexagonalGrid(visual=True)
-
-        init_state = env.get_state()
-        tree = MonteCarloTree(deepcopy(init_state), self.actor, self.epsilon, self.exploration_constant)
+        tree = MonteCarloTree(self.actor, self.epsilon, self.exploration_constant)
 
         for game_index in range(self.games):
             if game_index % self.save_interval == 0:
                 self.actor.save_model(game_index)
 
-            env.reset()
-            tree.reset(deepcopy(init_state))
+            env.reset(random=True)
+            tree.reset(env.get_state())
+
+            assert env.get_player_turn() == tree.root.player
 
             while True:
                 if env.check_win_condition():
                     #env.visualize(False, 10)
                     break
 
-                for sim_index in range(self.simulations):
-                    tree.single_pass()
+                tree.run_simulations(self.simulations, env.get_state())
 
                 distribution = tree.get_action_distribution(tree.root)
                 self.append_replay_buffer(env.get_state(), distribution)
 
                 chosen_key = max(distribution, key=distribution.get)
                 action = UniversalAction(chosen_key)
+                tree.set_root(action)
                 env.execute_action(action)
-
-                tree.set_root(action, env.get_state())
 
                 # Visualize last game
                 # if game_index == self.games - 1:
@@ -100,9 +98,6 @@ class ReinforcementLearning:
             index = row * self.board_size + col
             target[index] = value
 
-        #assert distribution[(1, 3)] == target[7]
-        #assert distribution[(3, 3)] == target[15]
-
         if len(self.replay_buffer) > Config.buffer_limit:
             self.replay_buffer.pop(0)
         self.replay_buffer.append((input, target))
@@ -135,12 +130,12 @@ class ReinforcementLearning:
         for key, value in distribution.items():
             # If probability is higher than 50%, check if it could be a winning state
             if value > 0.5:
-                self.heuristic_env.state.nodes = deepcopy(state.nodes)
+                self.heuristic_env.reset(state)
 
                 self.heuristic_env.state.nodes[key] = player.value + 1
-                self.heuristic_env.state.player = player
+                self.heuristic_env.game_counter += 1
                 if self.heuristic_env.check_win_condition():
-                    print('found winning action')
+                    #print('found winning action')
                     distribution = dict.fromkeys(distribution.keys(), 0.0)
                     distribution[key] = 1.0
                     return distribution

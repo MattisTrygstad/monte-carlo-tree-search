@@ -53,7 +53,6 @@ class Actor(nn.Module):
 
         size = sqrt(len(all_nodes))
         action_coordinates = (greedy_index // size, greedy_index % size)
-
         assert action_coordinates in legal_actions
         action = UniversalAction(action_coordinates)
 

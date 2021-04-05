@@ -64,12 +64,8 @@ class Tournament:
         plot(self.results)
 
     def game(self, game_index: int, p1: Actor, p2: Actor):
-        self.env.reset()
 
-        start_player = Player.ONE
-        self.env.state.player = start_player
-        self.env.game_counter = 1 if start_player == Player.TWO else 0
-        end_player = Player.ONE if start_player == Player.TWO else Player.TWO
+        self.env.reset(random=True)
 
         while True:
             # Check win condition
@@ -80,11 +76,11 @@ class Tournament:
             state = self.env.get_state()
             actions = self.env.get_legal_actions()
 
-            if player == start_player:
-                action = p1.generate_probabilistic_action(state, actions)
+            if player == Player.ONE:
+                action = p1.generate_action(state, actions)
 
-            elif player == end_player:
-                action = p2.generate_probabilistic_action(state, actions)
+            elif player == Player.TWO:
+                action = p2.generate_action(state, actions)
 
             self.env.execute_action(action)
 

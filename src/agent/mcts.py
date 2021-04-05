@@ -17,23 +17,20 @@ from environment.universal_state import UniversalState
 
 class MonteCarloTree:
 
-    def __init__(self, state: UniversalState, actor: Actor, epsilon: float, exploration_constant: float) -> None:
-        self.root = Node(None, state.player)
-        self.init_state = state
-        self.env = HexagonalGrid(self.init_state, False)
+    def __init__(self, actor: Actor, epsilon: float, exploration_constant: float) -> None:
+        self.root = None
+        self.env = HexagonalGrid()
         self.epsilon = epsilon
         self.exploration_constant = exploration_constant
         self.actor = actor
 
     def reset(self, state: UniversalState):
-        self.env.reset()
-        self.init_state = state
+        self.env.reset(state)
         self.root = Node(None, state.player)
 
-    def set_root(self, action: UniversalAction, state: UniversalState):
-        self.init_state = state
-        self.env.reset(state)
+        assert state.player == self.env.get_player_turn()
 
+    def set_root(self, action: UniversalAction):
         self.root = self.root.children[action.coordinates]
 
     @staticmethod
@@ -44,10 +41,15 @@ class MonteCarloTree:
 
         return distribution
 
-    def single_pass(self) -> None:
-        node = self.tree_search()
-        winner = self.evaluate_leaf()
-        self.backprop(node, winner)
+    def run_simulations(self, simulations: int, init_state: UniversalState) -> None:
+        for simulation_index in range(simulations):
+            self.env.reset(deepcopy(init_state))
+
+            assert self.env.get_player_turn() == self.root.player
+
+            node = self.tree_search(self.root)
+            winner = self.evaluate_leaf()
+            self.backprop(node, winner)
 
     def tree_policy(self, node: Node) -> UniversalAction:
         player = self.env.get_player_turn()
@@ -64,13 +66,10 @@ class MonteCarloTree:
         selected_action = best_action if player == Player.ONE else worst_action
         return UniversalAction(selected_action)
 
-    def tree_search(self) -> Node:
+    def tree_search(self, node: Node) -> Node:
         """
         Traversing the tree from the root to a leaf node by using the tree policy.
         """
-        node = self.root
-
-        self.env.reset(UniversalState(deepcopy(self.init_state.nodes), self.init_state.player))
 
         while len(node.children) != 0:
             action = self.tree_policy(node)
