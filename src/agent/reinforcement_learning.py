@@ -6,11 +6,12 @@ import sys
 
 import numpy as np
 import torch
-from agent.actor_test import Actor
+from agent.actor import Actor
 from agent.mcts import MonteCarloTree
 from environment.hexagonal_grid import HexagonalGrid
 from environment.universal_action import UniversalAction
 from environment.universal_state import UniversalState
+from utils.config_parser import Config
 from utils.loadingbar import print_progress
 from utils.visualize_training import visualize_training
 
@@ -39,7 +40,7 @@ class ReinforcementLearning:
     def train(self):
         env = HexagonalGrid(visual=True)
 
-        init_state = UniversalState(deepcopy(env.state.nodes), env.get_player_turn())
+        init_state = env.get_state()
         tree = MonteCarloTree(deepcopy(init_state), self.actor, self.epsilon, self.exploration_constant)
 
         for game_index in range(self.games):
@@ -88,6 +89,8 @@ class ReinforcementLearning:
                 continue
             distribution[(row, col)] = 0
 
+        assert len(distribution) == len(state.nodes.keys())
+
         distribution = self.apply_heuristics(distribution, state)
 
         input = state.generate_actor_input()
@@ -100,12 +103,12 @@ class ReinforcementLearning:
         assert distribution[(1, 3)] == target[7]
         assert distribution[(3, 3)] == target[15]
 
-        if len(self.replay_buffer) > 800:
+        if len(self.replay_buffer) > Config.buffer_limit:
             self.replay_buffer.pop(0)
         self.replay_buffer.append((input, target))
 
     def train_actor(self, game_index: int):
-        batch_size = min(64, len(self.replay_buffer))
+        batch_size = min(Config.batch_size, len(self.replay_buffer))
 
         samples = sample(self.replay_buffer, batch_size)
 

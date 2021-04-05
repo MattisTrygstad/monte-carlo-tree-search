@@ -19,9 +19,7 @@ class Node:
         edge_traversals, q_value = self.edges[action]
         exploration_constant *= 1 if self.player == Player.ONE else -1
 
-        # Avoid log(0)
-        node_traversals = self.visit_count if self.visit_count > 0 else 1
-        return q_value + exploration_constant * np.sqrt(np.log(node_traversals) / (1 + edge_traversals))
+        return q_value + exploration_constant * np.sqrt(np.log(self.visit_count) / (1 + edge_traversals))
 
     def __str__(self) -> str:
         return f'cached_action: {self.cached_action}\nplayer: {self.player}\nedges: {len(self.edges)}\nvisit_count: {self.visit_count}\nparent: {True if self.parent else False}'

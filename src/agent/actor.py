@@ -85,11 +85,11 @@ class Actor(nn.Module):
 
     def fit(self, x_train: np.ndarray, y_train: np.ndarray) -> tuple:
         x_train = Actor.__to_tensor(x_train)
+        #x_train.apply_(lambda x: -1 if x == 2 else x)
 
         y_train = Actor.__to_tensor(y_train)
 
         for epoch_index in range(self.epochs):
-            # x_train.apply_(lambda x: -1 if x == 2 else x)
             prediction: torch.Tensor = self.model(x_train)
             assert np.array(prediction.tolist()).shape == y_train.shape
             loss = self.loss_function(prediction, y_train)
@@ -103,7 +103,7 @@ class Actor(nn.Module):
 
     def inference(self, input: torch.Tensor) -> torch.Tensor:
         with torch.no_grad():
-            input.apply_(lambda x: -1 if x == 2 else x)
+            #input.apply_(lambda x: -1 if x == 2 else x)
             return self.model(input)
 
     def save_model(self, iterations: int) -> None:

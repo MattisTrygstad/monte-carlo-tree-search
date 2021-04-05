@@ -87,7 +87,7 @@ class Actor(nn.Module):
         # print(self.model)
 
     def generate_action(self, state: UniversalState, legal_actions: list) -> UniversalAction:
-        input = state.to_numpy()
+        input = state.generate_actor_input()
 
         prediction = self.inference_softmax([input]).data.numpy()[0]
 
@@ -135,7 +135,6 @@ class Actor(nn.Module):
             player = x[0]
             x = x[1:].reshape(self.board_size, self.board_size)
             planes = np.zeros(9 * self.board_size**2).reshape(9, self.board_size, self.board_size)
-
             planes[player + 3] += 1  # plane 3/4
             for r in range(self.board_size):
                 for c in range(self.board_size):

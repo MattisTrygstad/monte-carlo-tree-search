@@ -26,7 +26,7 @@ class UniversalState:
 
     def to_numpy(self):
         board_size = int(sqrt(len(self.nodes.keys())))
-        state = np.zeros((board_size**2,))
+        state = np.zeros((board_size**2,), dtype=int)
         for (row, col), value in self.nodes.items():
             index = row * board_size + col
             state[index] = value

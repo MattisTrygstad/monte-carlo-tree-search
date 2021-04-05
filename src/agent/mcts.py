@@ -7,7 +7,7 @@ import sys
 from typing import Tuple
 from unittest.mock import seal
 import numpy as np
-from agent.actor_test import Actor
+from agent.actor import Actor
 from agent.node import Node
 from enums import Player
 from environment.hexagonal_grid import HexagonalGrid
