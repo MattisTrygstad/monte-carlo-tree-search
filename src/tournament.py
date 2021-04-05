@@ -2,7 +2,7 @@
 
 from random import choice
 import sys
-from agent.actor import Actor
+from agent.actor_test import Actor
 from enums import Player
 from environment.hexagonal_grid import HexagonalGrid
 from utils.config_parser import Config

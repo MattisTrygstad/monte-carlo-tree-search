@@ -39,8 +39,11 @@ class UniversalState:
     def ordered_keys(self):
         board_size = int(sqrt(len(self.nodes.keys())))
         state = np.zeros((board_size**2,), dtype=object)
-        for (row, col), value in self.nodes.items():
+        for (row, col) in self.nodes.keys():
             index = row * board_size + col
             state[index] = (row, col)
+
+        assert (1, 3) == state[7]
+        assert (3, 3) == state[15]
 
         return state

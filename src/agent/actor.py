@@ -19,23 +19,16 @@ class Actor(nn.Module):
         self.learning_rate = learning_rate
         self.save_interval = save_interval
 
-        # Input layer
-        network_config = [nn.Linear(board_size**2 + 1, nn_dimensions[0])]
-        # network_config.append(nn.Dropout(0.5))
-        activation_function = instantiate_activation_func(activation_functions[0])
-        network_config.append(activation_function) if activation_function else None
+        assert len(nn_dimensions) - 1 == len(activation_functions)
 
-        # Hidden layers
-        for layer_index in range(len(nn_dimensions) - 1):
-            network_config.append(nn.Linear(nn_dimensions[layer_index], nn_dimensions[layer_index + 1]))
+        self.model = nn.Sequential()
+        for layer_index in range(1, len(nn_dimensions)):
+            self.model.add_module(f'HiddenLayer{layer_index}', nn.Linear(nn_dimensions[layer_index - 1], nn_dimensions[layer_index]))
 
-            activation_function = instantiate_activation_func(activation_functions[layer_index + 1])
-            network_config.append(activation_function) if activation_function else None
+            activation_function = instantiate_activation_func(activation_functions[layer_index - 1])
+            self.model.add_module(f'Activation{layer_index}', activation_function) if activation_function else None
 
-        # Output layer
-        network_config.append(nn.Linear(nn_dimensions[-1], board_size**2))
-        network_config.append(nn.Softmax(-1))
-        self.model = nn.Sequential(*network_config)
+        self.model.add_module(f'Output activation', nn.Softmax(-1))
         self.model.apply(self.init_weights)
         self.optimizer = instantiate_optimizer(optimizer, list(self.model.parameters()), self.learning_rate)
         self.loss_function = nn.BCELoss(reduction='mean')
@@ -66,12 +59,12 @@ class Actor(nn.Module):
 
         return action
 
-    """ def generate_probabilistic_action(self, state: UniversalState, legal_actions: list) -> UniversalAction:
+    def generate_probabilistic_action(self, state: UniversalState, legal_actions: list) -> UniversalAction:
         input = Actor.__to_tensor(state.generate_actor_input())
 
         prediction = self.inference(input).data.numpy()
 
-        all_nodes = state.nodes.keys()
+        all_nodes = state.ordered_keys()
 
         nodes: list = [1 if node in legal_actions else 0 for node in all_nodes]
 
@@ -88,13 +81,15 @@ class Actor(nn.Module):
         assert action_coordinates in legal_actions
         action = UniversalAction(action_coordinates)
 
-        return action """
+        return action
 
     def fit(self, x_train: np.ndarray, y_train: np.ndarray) -> tuple:
         x_train = Actor.__to_tensor(x_train)
+
         y_train = Actor.__to_tensor(y_train)
 
         for epoch_index in range(self.epochs):
+            # x_train.apply_(lambda x: -1 if x == 2 else x)
             prediction: torch.Tensor = self.model(x_train)
             assert np.array(prediction.tolist()).shape == y_train.shape
             loss = self.loss_function(prediction, y_train)
@@ -106,8 +101,9 @@ class Actor(nn.Module):
 
         return loss.item(), accuracy
 
-    def inference(self, input):
+    def inference(self, input: torch.Tensor) -> torch.Tensor:
         with torch.no_grad():
+            input.apply_(lambda x: -1 if x == 2 else x)
             return self.model(input)
 
     def save_model(self, iterations: int) -> None:
@@ -123,7 +119,7 @@ class Actor(nn.Module):
     def __to_tensor(data):
         return torch.FloatTensor(data)
 
-    @staticmethod
+    @ staticmethod
     def init_weights(m: nn.Module) -> None:
         if type(m) == nn.Linear:
             nn.init.xavier_uniform_(m.weight)

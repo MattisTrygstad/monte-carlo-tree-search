@@ -7,7 +7,7 @@ import sys
 from typing import Tuple
 from unittest.mock import seal
 import numpy as np
-from agent.actor import Actor
+from agent.actor_test import Actor
 from agent.node import Node
 from enums import Player
 from environment.hexagonal_grid import HexagonalGrid
@@ -120,7 +120,7 @@ class MonteCarloTree:
             if random.uniform(0, 1) < self.epsilon:
                 action = UniversalAction(choice(actions))
             else:
-                state = UniversalState(deepcopy(self.env.state.nodes), self.env.get_player_turn())
+                state = self.env.get_state()
                 action = self.actor.generate_action(state, actions)
                 if action.coordinates not in actions:
                     print(f'Actor chose an invalid action.\nactions: {actions}\nselected action:{action.coordinates}')
@@ -137,10 +137,9 @@ class MonteCarloTree:
         """
 
         # TODO: -1 or 0 ?
-        reinforcement = 1 if winner == Player.ONE else 0
+        reinforcement = 1 if winner == Player.ONE else -1
 
         node.visit_count += 1
-
         while node.parent:
             node.parent.visit_count += 1
 

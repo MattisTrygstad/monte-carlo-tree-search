@@ -6,7 +6,7 @@ import sys
 
 import numpy as np
 import torch
-from agent.actor import Actor
+from agent.actor_test import Actor
 from agent.mcts import MonteCarloTree
 from environment.hexagonal_grid import HexagonalGrid
 from environment.universal_action import UniversalAction
@@ -58,13 +58,13 @@ class ReinforcementLearning:
                     tree.single_pass()
 
                 distribution = tree.get_action_distribution(tree.root)
-                self.append_replay_buffer(UniversalState(deepcopy(env.state.nodes), env.get_player_turn()), distribution)
+                self.append_replay_buffer(env.get_state(), distribution)
 
                 chosen_key = max(distribution, key=distribution.get)
                 action = UniversalAction(chosen_key)
                 env.execute_action(action)
 
-                tree.set_root(action, UniversalState(deepcopy(env.state.nodes), env.get_player_turn()))
+                tree.set_root(action, env.get_state())
 
                 # Visualize last game
                 # if game_index == self.games - 1:
