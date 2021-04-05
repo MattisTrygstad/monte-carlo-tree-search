@@ -48,7 +48,7 @@ class Tournament:
 
             for p2_index in range(len(self.agents)):
                 p2: Actor = self.agents[p2_index]
-                print(f'Player {p1.iterations} vs. Player {p2.iterations}')
+                print(f'Blue {p1.iterations} vs. Red {p2.iterations}')
                 scores = [0, 0]
                 for game_index in range(self.games):
                     winner: Player = self.game(game_index, p1, p2)
@@ -66,6 +66,9 @@ class Tournament:
     def game(self, game_index: int, p1: Actor, p2: Actor):
 
         self.env.reset(random=True)
+
+        if game_index == 0 and Config.visualize:
+            print(f'Start: {self.env.get_player_turn()}')
 
         while True:
             # Check win condition
