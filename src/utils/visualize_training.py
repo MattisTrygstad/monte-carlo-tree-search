@@ -14,3 +14,5 @@ def visualize_training(losses: np.ndarray, accuracies: np.ndarray) -> None:
     text = f"Title"
     plt.title(text)
     plt.show(block=True)
+
+    plt.close()

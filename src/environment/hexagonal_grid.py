@@ -147,15 +147,16 @@ class HexagonalGrid(Environment):
         nx.draw(self.G, pos=node_coordinates, nodelist=player_two_nodes, node_color=Color.PLAYER_2.value, node_size=800, ax=self.ax, labels=node_names, font_color=Color.BACKGROUND.value)
         nx.draw(self.G, pos=node_coordinates, edge_color=colors, width=weights, nodelist=empty_nodes, node_color=Color.EMPTY_NODE.value, node_size=800)
 
-        x1 = 1.2
-        x2 = -1.8
-        y1 = -0.8
-        y2 = -3.5
+        if self.state.size == 4:
+            x1 = 1.2
+            x2 = -1.8
+            y1 = -0.8
+            y2 = -3.5
 
-        self.ax.text(x2, y1, 'Player 1', fontsize=15, color=Color.PLAYER_1.value)
-        self.ax.text(x2, y2, 'Player 2', fontsize=15, color=Color.PLAYER_2.value)
-        self.ax.text(x1, y1, 'Player 2', fontsize=15, color=Color.PLAYER_2.value)
-        self.ax.text(x1, y2, 'Player 1', fontsize=15, color=Color.PLAYER_1.value)
+            self.ax.text(x2, y1, 'Player 2', fontsize=15, color=Color.PLAYER_1.value)
+            self.ax.text(x2, y2, 'Player 1', fontsize=15, color=Color.PLAYER_2.value)
+            self.ax.text(x1, y1, 'Player 1', fontsize=15, color=Color.PLAYER_2.value)
+            self.ax.text(x1, y2, 'Player 2', fontsize=15, color=Color.PLAYER_1.value)
 
         self.fig.tight_layout()
         plt.show(block=block)

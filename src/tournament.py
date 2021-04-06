@@ -1,14 +1,11 @@
 
 
-from random import choice
-import sys
+import matplotlib.pyplot as plt
 from agent.actor import Actor
 from enums import Player
 from environment.hexagonal_grid import HexagonalGrid
 from utils.config_parser import Config
 
-from matplotlib import pyplot as plt
-from matplotlib.pyplot import figure
 import numpy as np
 
 
@@ -18,12 +15,11 @@ class Tournament:
         self.games = games
 
         self.agents = []
-        self.results = {}  # Key: str(iteraton_num), value: wins
+        self.series_results = {}  # Key: str(iteraton_num), value: wins
+        self.game_results = {}  # Key: str(iteraton_num), value: wins
 
         self.env = HexagonalGrid(visual=True)
         self.load_agents(training_games, save_interval)
-
-        # plt.close('all')
 
     def load_agents(self, training_games: int, save_interval: int) -> None:
 
@@ -33,7 +29,8 @@ class Tournament:
 
         for agent_index in range(number_of_agents):
             agent_iterations = int(agent_index * save_interval)
-            self.results[str(agent_iterations)] = 0
+            self.series_results[str(agent_iterations)] = 0
+            self.game_results[str(agent_iterations)] = 0
 
             actor = Actor(Config.epochs, Config.actor_learning_rate, Config.save_interval, Config.board_size, Config.nn_dimentions, Config.nn_activation_functions, Config.optimizer)
             actor.load_model(agent_iterations)
@@ -56,12 +53,20 @@ class Tournament:
 
                 print(f'Final scores: {scores[0]} - {scores[1]}\n')
                 if scores[0] > scores[1]:
-                    self.results[p1.iterations] += 1
+                    self.series_results[p1.iterations] += 1
                 elif scores[0] < scores[1]:
-                    self.results[p2.iterations] += 1
+                    self.series_results[p2.iterations] += 1
 
-        print(self.results)
-        plot(self.results)
+                self.game_results[p1.iterations] += scores[0]
+                self.game_results[p2.iterations] += scores[1]
+
+        # print(self.series_results)
+
+        print(f'-- Total games won during tournament --')
+        for k, v in sorted(self.game_results.items(), key=lambda item: item[1], reverse=True):
+            print(f'ANET_{k}: {v:5.0f} wins')
+        # plot(self.game_results)
+        plot(self.series_results)
 
     def game(self, game_index: int, p1: Actor, p2: Actor):
 
@@ -92,8 +97,8 @@ class Tournament:
 
 
 def plot(results: dict):
-
-    figure(num=None, figsize=(12, 6))
+    plt.close()
+    plt.figure(figsize=(12, 6))
 
     x_axis_labels = []
     y_axis_values = []
@@ -107,10 +112,11 @@ def plot(results: dict):
     plt.bar(y_pos + 0, y_axis_values, width=0.5, color='c', label='legend title')
     plt.xticks(y_pos, x_axis_labels)
     plt.legend(loc='best')
-    plt.ylabel('This is Y-axis label')
-    plt.xlabel('This is X-axis label')
+    plt.ylabel('Wins')
+    plt.xlabel('Episodes trained')
 
-    plt.title("This is the Graph Title")
+    plt.title("Tournament results")
 
-    # Show the plot
     plt.show()
+
+    plt.close()

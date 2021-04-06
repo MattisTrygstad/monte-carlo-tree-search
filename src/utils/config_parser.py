@@ -9,8 +9,7 @@ class Config:
 
     train = bool(ast.literal_eval(config.get('PROGRAM_FLOW', 'train')))
     tournament = bool(ast.literal_eval(config.get('PROGRAM_FLOW', 'tournament')))
-    human_mode = bool(ast.literal_eval(config.get('PROGRAM_FLOW', 'human_mode')))
-    experiments = bool(ast.literal_eval(config.get('PROGRAM_FLOW', 'experiments')))
+    online_tournament = bool(ast.literal_eval(config.get('PROGRAM_FLOW', 'online_tournament')))
 
     tournament_games = int(config.get('TOURNAMENT', 'tournament_games'))
     visualize = bool(ast.literal_eval(config.get('TOURNAMENT', 'visualize')))
