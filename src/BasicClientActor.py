@@ -41,7 +41,7 @@ class BasicClientActor(BasicClientActorAbs):
         for index in range(len(state)):
             nodes[(index // board_size, index % board_size)] = state[index]
 
-        universal_state = UniversalState(nodes, )
+        universal_state = UniversalState(nodes, player)
 
         return next_move
 
