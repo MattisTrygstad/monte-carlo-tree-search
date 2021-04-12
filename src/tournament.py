@@ -83,10 +83,10 @@ class Tournament:
             actions = self.env.get_legal_actions()
 
             if player == Player.ONE:
-                action = p1.generate_probabilistic_action(state, actions)
+                action = p1.generate_action(state, actions) if Config.visualize else p1.generate_probabilistic_action(state, actions)
 
             elif player == Player.TWO:
-                action = p2.generate_probabilistic_action(state, actions)
+                action = p2.generate_action(state, actions) if Config.visualize else p2.generate_probabilistic_action(state, actions)
 
             self.env.execute_action(action)
 

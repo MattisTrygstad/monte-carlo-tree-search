@@ -1,7 +1,9 @@
 import math
 from BasicClientActorAbs import BasicClientActorAbs
-from enums import Player
+from agent.actor import Actor
+from enums import NodeState, Player
 from environment.universal_state import UniversalState
+from utils.config_parser import Config
 
 
 class BasicClientActor(BasicClientActorAbs):
@@ -9,6 +11,9 @@ class BasicClientActor(BasicClientActorAbs):
     def __init__(self, IP_address=None, verbose=True):
         self.series_id = -1
         BasicClientActorAbs.__init__(self, IP_address, verbose=verbose)
+
+        self.actor = Actor(0, 0, 0, 6, Config.nn_dimentions, Config.nn_activation_functions, Config.optimizer)
+        self.actor.load_model(45)
 
     def handle_get_action(self, state):
         """
@@ -22,8 +27,8 @@ class BasicClientActor(BasicClientActorAbs):
         """
 
         # This is an example player who picks random moves. REMOVE THIS WHEN YOU ADD YOUR OWN CODE !!
-        next_move = tuple(self.pick_random_free_cell(
-            state, size=int(math.sqrt(len(state) - 1))))
+        # next_move = tuple(self.pick_random_free_cell(
+        #    state, size=int(math.sqrt(len(state) - 1))))
         #############################
         #
         #
@@ -31,11 +36,11 @@ class BasicClientActor(BasicClientActorAbs):
         #
         # next_move = ???
         ##############################
-        print(state)
+        state = list(state)
         player_num = state.pop(0)
         player = Player.ONE if player_num == 1 else Player.TWO
 
-        board_size = int(math.sqrt(len(state) - 1))
+        board_size = int(math.sqrt(len(state)))
 
         nodes = {}
         for index in range(len(state)):
@@ -43,7 +48,13 @@ class BasicClientActor(BasicClientActorAbs):
 
         universal_state = UniversalState(nodes, player)
 
-        return next_move
+        legal_actions = [key for (key, value) in universal_state.nodes.items() if value == NodeState.EMPTY.value]
+
+        action = self.actor.generate_action(universal_state, legal_actions).coordinates
+
+        action = (int(action[0]), int(action[1]))
+
+        return action
 
     def handle_series_start(self, unique_id, series_id, player_map, num_games, game_params):
         """
