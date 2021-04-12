@@ -1,6 +1,8 @@
 
 from copy import deepcopy
 from math import sqrt
+import os
+from pathlib import Path
 from random import choice
 import sys
 import numpy as np
@@ -9,6 +11,7 @@ import torch.nn as nn
 from environment.hexagonal_grid import HexagonalGrid
 from environment.universal_action import UniversalAction
 from environment.universal_state import UniversalState
+from utils.config_parser import Config
 from utils.instantiate import instantiate_activation_func, instantiate_optimizer
 
 
@@ -109,12 +112,14 @@ class Actor(nn.Module):
 
     def save_model(self, iterations: int) -> None:
         print(f'\nSaved model ANET_{iterations}')
-        torch.save(self.state_dict(), f'../models/ANET_{iterations}')
+        dir = f'../models/{Config.model_dir}'
+        Path(dir).mkdir(parents=True, exist_ok=True)
+        torch.save(self.state_dict(), dir + f'/ANET_{iterations}')
 
     def load_model(self, iterations: int):
         self.iterations = str(iterations)
         print(f'Loaded model ANET_{iterations}')
-        self.load_state_dict(torch.load(f'../models/ANET_{iterations}'))
+        self.load_state_dict(torch.load(f'../models/{Config.model_dir}/ANET_{iterations}'))
 
     @ staticmethod
     def __to_tensor(data):

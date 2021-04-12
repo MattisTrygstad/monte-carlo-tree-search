@@ -25,8 +25,6 @@ class Tournament:
 
         number_of_agents = int(training_games // save_interval) + 1
 
-        print(number_of_agents)
-
         for agent_index in range(number_of_agents):
             agent_iterations = int(agent_index * save_interval)
             self.series_results[str(agent_iterations)] = 0
