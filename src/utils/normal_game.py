@@ -2,13 +2,13 @@ import ast
 import sys
 
 from matplotlib import pyplot as plt
-from environment.hexagonal_grid import HexagonalGrid
+from environment.state_manager import StateManager
 from environment.universal_action import UniversalAction
 from utils.config_parser import Config
 
 
 def normal_game():
-    env = HexagonalGrid(Config.win_multiplier)
+    env = StateManager(Config.win_multiplier)
 
     env.visualize(False)
 

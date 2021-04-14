@@ -3,7 +3,7 @@
 import matplotlib.pyplot as plt
 from agent.actor import Actor
 from enums import Player
-from environment.hexagonal_grid import HexagonalGrid
+from environment.state_manager import StateManager
 from utils.config_parser import Config
 
 import numpy as np
@@ -18,7 +18,7 @@ class Tournament:
         self.series_results = {}  # Key: str(iteraton_num), value: wins
         self.game_results = {}  # Key: str(iteraton_num), value: wins
 
-        self.env = HexagonalGrid(visual=True)
+        self.env = StateManager(visual=True)
         self.load_agents(training_games, save_interval)
 
     def load_agents(self, training_games: int, save_interval: int) -> None:
@@ -58,12 +58,10 @@ class Tournament:
                 self.game_results[p1.iterations] += scores[0]
                 self.game_results[p2.iterations] += scores[1]
 
-        # print(self.series_results)
-
         print(f'-- Total games won during tournament --')
         for k, v in sorted(self.game_results.items(), key=lambda item: item[1], reverse=True):
             print(f'ANET_{k}: {v:5.0f} wins')
-        # plot(self.game_results)
+
         plot(self.series_results)
 
     def game(self, game_index: int, p1: Actor, p2: Actor):
@@ -74,7 +72,6 @@ class Tournament:
             print(f'Start: {self.env.get_player_turn()}')
 
         while True:
-            # Check win condition
             if self.env.check_win_condition():
                 return self.env.winner
 

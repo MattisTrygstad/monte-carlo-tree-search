@@ -1,20 +1,20 @@
 
-from copy import deepcopy
 import math
-from random import choice
 import sys
-from matplotlib import pyplot as plt
-import numpy as np
-from abstract_classes.environment import Environment
-from enums import BoardType, Color, NodeState, Player
+from copy import deepcopy
+from random import choice
+
 import networkx as nx
-from typing import Dict, Tuple
+from abstract_classes.environment import Environment
+from enums import Color, NodeState, Player
+from matplotlib import pyplot as plt
+
 from environment.hexagonal_grid_state import HexagonalGridState
 from environment.universal_action import UniversalAction
 from environment.universal_state import UniversalState
 
 
-class HexagonalGrid(Environment):
+class StateManager(Environment):
 
     def __init__(self, visual: bool = False):
         self.visual = visual

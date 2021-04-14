@@ -1,19 +1,16 @@
-
-
-from copy import deepcopy
 from random import sample
-import sys
 
 import numpy as np
 import torch
-from agent.actor import Actor
-from agent.mcts import MonteCarloTree
-from environment.hexagonal_grid import HexagonalGrid
+from environment.state_manager import StateManager
 from environment.universal_action import UniversalAction
 from environment.universal_state import UniversalState
 from utils.config_parser import Config
 from utils.loadingbar import print_progress
 from utils.visualize_training import visualize_training
+
+from agent.actor import Actor
+from agent.mcts import MonteCarloTree
 
 
 class ReinforcementLearning:
@@ -35,10 +32,10 @@ class ReinforcementLearning:
         self.losses = []
         self.accuracies = []
 
-        self.heuristic_env = HexagonalGrid(visual=False)
+        self.heuristic_env = StateManager(visual=False)
 
     def train(self):
-        env = HexagonalGrid(visual=True)
+        env = StateManager(visual=True)
         tree = MonteCarloTree(self.actor, self.epsilon, self.exploration_constant)
 
         for game_index in range(self.games):
@@ -52,7 +49,6 @@ class ReinforcementLearning:
 
             while True:
                 if env.check_win_condition():
-                    #env.visualize(False, 10)
                     break
 
                 tree.run_simulations(self.simulations, env.get_state())
@@ -65,11 +61,7 @@ class ReinforcementLearning:
                 tree.set_root(action)
                 env.execute_action(action)
 
-                # Visualize last game
-                # if game_index == self.games - 1:
-                #     env.visualize(False, 1)
-
-            self.train_actor(game_index)
+            self.train_actor()
             tree.epsilon -= self.epsilon_decay
 
             loss = 0 if len(self.losses) == 0 else self.losses[-1]
@@ -81,7 +73,6 @@ class ReinforcementLearning:
         visualize_training(self.losses, self.accuracies)
 
     def append_replay_buffer(self, state: UniversalState, distribution: dict) -> None:
-
         for (row, col) in state.nodes.keys():
             if (row, col) in distribution.keys():
                 continue
@@ -102,11 +93,9 @@ class ReinforcementLearning:
             self.replay_buffer.pop(0)
         self.replay_buffer.append((input, target))
 
-    def train_actor(self, game_index: int):
+    def train_actor(self):
         batch_size = min(Config.batch_size, len(self.replay_buffer))
-
         samples = sample(self.replay_buffer, batch_size)
-
         x_train, y_train = list(zip(*samples))
 
         loss, accuracy = self.actor.fit(x_train, y_train)
@@ -118,24 +107,17 @@ class ReinforcementLearning:
         player = state.player
 
         values = list(state.nodes.values())
-
-        # If first move in game, select center
         if sum(values) == 0:
-            #print('first move')
             distribution = dict.fromkeys(distribution.keys(), 0.0)
             distribution[(self.board_size // 2, self.board_size // 2)] = 1.0
             return distribution
 
-        # Check for obvious wins in next move
         for key, value in distribution.items():
-            # If probability is higher than 50%, check if it could be a winning state
             if value > 0.5:
                 self.heuristic_env.reset(state)
-
                 self.heuristic_env.state.nodes[key] = player.value + 1
                 self.heuristic_env.game_counter += 1
                 if self.heuristic_env.check_win_condition():
-                    #print('found winning action')
                     distribution = dict.fromkeys(distribution.keys(), 0.0)
                     distribution[key] = 1.0
                     return distribution

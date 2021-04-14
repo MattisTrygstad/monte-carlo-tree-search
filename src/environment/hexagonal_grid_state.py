@@ -19,10 +19,6 @@ class HexagonalGridState(UniversalState):
         self.node_names = {}  # (row, col): str
         self.node_coordinates = {}  # (row, col): (x_value, y_value)
 
-        # Describes the last executed action
-        self.start_pos = ()
-        self.end_pos = ()
-
         if not state:
             self.__generate_nodes()
         else:

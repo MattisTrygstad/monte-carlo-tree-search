@@ -1,5 +1,3 @@
-
-
 from agent.reinforcement_learning import ReinforcementLearning
 from BasicClientActor import BasicClientActor
 from tournament import Tournament

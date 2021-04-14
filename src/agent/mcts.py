@@ -1,16 +1,12 @@
 
 
 from copy import deepcopy
-from random import choice, choices
+from random import choice
 import random
-import sys
-from typing import Tuple
-from unittest.mock import seal
-import numpy as np
 from agent.actor import Actor
 from agent.node import Node
 from enums import Player
-from environment.hexagonal_grid import HexagonalGrid
+from environment.state_manager import StateManager
 from environment.universal_action import UniversalAction
 from environment.universal_state import UniversalState
 
@@ -19,7 +15,7 @@ class MonteCarloTree:
 
     def __init__(self, actor: Actor, epsilon: float, exploration_constant: float) -> None:
         self.root = None
-        self.env = HexagonalGrid()
+        self.env = StateManager()
         self.epsilon = epsilon
         self.exploration_constant = exploration_constant
         self.actor = actor
@@ -42,7 +38,7 @@ class MonteCarloTree:
         return distribution
 
     def run_simulations(self, simulations: int, init_state: UniversalState) -> None:
-        for simulation_index in range(simulations):
+        for _ in range(simulations):
             self.env.reset(deepcopy(init_state))
 
             assert self.env.get_player_turn() == self.root.player
