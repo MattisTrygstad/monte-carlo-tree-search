@@ -1,1 +1,1 @@
-# IT3105-project-1
+# monte-carlo-tree-search

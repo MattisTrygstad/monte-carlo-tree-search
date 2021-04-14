@@ -94,7 +94,7 @@ class ReinforcementLearning:
         self.replay_buffer.append((input, target))
 
     def train_actor(self):
-        batch_size = min(Config.batch_size, len(self.replay_buffer))
+        batch_size = min(Config.sample_size, len(self.replay_buffer))
         samples = sample(self.replay_buffer, batch_size)
         x_train, y_train = list(zip(*samples))
 

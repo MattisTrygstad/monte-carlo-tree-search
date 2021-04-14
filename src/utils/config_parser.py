@@ -25,7 +25,7 @@ class Config:
     actor_learning_rate = float(config.get('LEARNING', 'actor_learning_rate'))
     save_interval = float(config.get('LEARNING', 'save_interval'))
     exploration_constant = float(config.get('LEARNING', 'exploration_constant'))
-    batch_size = int(config.get('LEARNING', 'batch_size'))
+    sample_size = int(config.get('LEARNING', 'sample_size'))
     buffer_limit = int(config.get('LEARNING', 'buffer_limit'))
     model_dir = str(ast.literal_eval(config.get('LEARNING', 'model_dir')))
 
