@@ -6,7 +6,7 @@ from utils.config_parser import Config
 
 def main():
     if Config.online_tournament:
-        client = BasicClientActor(verbose=True)
+        client = BasicClientActor(verbose=False)
         client.connect_to_server()
     else:
 

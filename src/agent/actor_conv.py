@@ -10,6 +10,7 @@ from environment.state_manager import StateManager
 from environment.universal_action import UniversalAction
 from environment.universal_state import UniversalState
 from utils.bridges import generate_bridge_neighbors
+from utils.config_parser import Config
 from utils.instantiate import instantiate_activation_func, instantiate_optimizer
 
 
@@ -142,12 +143,12 @@ class Actor(nn.Module):
 
     def save_model(self, iterations: int) -> None:
         print(f'\nSaved model ANET_{iterations}')
-        torch.save(self.state_dict(), f'../models/ANET_{iterations}')
+        torch.save(self.state_dict(), f'../models/{Config.model_dir}/ANET_{iterations}')
 
     def load_model(self, iterations: int):
         self.iterations = str(iterations)
         print(f'Loaded model ANET_{iterations}')
-        self.load_state_dict(torch.load(f'../models/ANET_{iterations}'))
+        self.load_state_dict(torch.load(f'../models/{Config.model_dir}/ANET_{iterations}'))
 
     @staticmethod
     def __to_tensor(data):

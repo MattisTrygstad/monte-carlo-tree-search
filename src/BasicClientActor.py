@@ -13,7 +13,7 @@ class BasicClientActor(BasicClientActorAbs):
         BasicClientActorAbs.__init__(self, IP_address, verbose=verbose)
 
         self.actor = Actor(0, 0, 0, 6, Config.nn_dimentions, Config.nn_activation_functions, Config.optimizer)
-        self.actor.load_model(40)
+        self.actor.load_model(100)
 
     def handle_get_action(self, state):
         """
@@ -68,6 +68,7 @@ class BasicClientActor(BasicClientActorAbs):
 
         """
         self.series_id = series_id
+        print(series_id)
         # SET ACTOR BASED ON BOARD_SIZE
         #############################
         #
