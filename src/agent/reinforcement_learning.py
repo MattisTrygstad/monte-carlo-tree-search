@@ -9,7 +9,7 @@ from utils.config_parser import Config
 from utils.loadingbar import print_progress
 from utils.visualize_training import visualize_training
 
-from agent.actor import Actor
+from agent.actor_conv import Actor
 from agent.mcts import MonteCarloTree
 
 

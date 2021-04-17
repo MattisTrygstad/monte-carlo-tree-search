@@ -3,7 +3,7 @@
 from copy import deepcopy
 from random import choice
 import random
-from agent.actor import Actor
+from agent.actor_conv import Actor
 from agent.node import Node
 from enums import Player
 from environment.state_manager import StateManager

@@ -1,6 +1,6 @@
 import math
 from BasicClientActorAbs import BasicClientActorAbs
-from agent.actor import Actor
+from agent.actor_conv import Actor
 from enums import NodeState, Player
 from environment.universal_state import UniversalState
 from utils.config_parser import Config
@@ -13,7 +13,7 @@ class BasicClientActor(BasicClientActorAbs):
         BasicClientActorAbs.__init__(self, IP_address, verbose=verbose)
 
         self.actor = Actor(0, 0, 0, 6, Config.nn_dimentions, Config.nn_activation_functions, Config.optimizer)
-        self.actor.load_model(45)
+        self.actor.load_model(40)
 
     def handle_get_action(self, state):
         """
