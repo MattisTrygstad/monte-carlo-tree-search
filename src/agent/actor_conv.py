@@ -52,7 +52,7 @@ class Actor(nn.Module):
 
         layers = OrderedDict([
             ('0', nn.ZeroPad2d(2)),
-            ('1', nn.Conv2d(9, nn_dimensions[0], 3, padding=1)),
+            ('1', nn.Conv2d(5, nn_dimensions[0], 3, padding=1)),
             ('2', instantiate_activation_func(activation_functions[0]))])
 
         layers[str(len(layers))] = nn.Conv2d(nn_dimensions[0], nn_dimensions[1], 3, padding=1)
@@ -140,7 +140,7 @@ class Actor(nn.Module):
         for x in input:
             player = x[0]
             x = x[1:].reshape(self.board_size, self.board_size)
-            planes = np.zeros(9 * self.board_size**2).reshape(9, self.board_size, self.board_size)
+            planes = np.zeros(5 * self.board_size**2).reshape(5, self.board_size, self.board_size)
 
             planes[player + 3] += 1  # plane 3/4
             for r in range(self.board_size):
@@ -148,7 +148,7 @@ class Actor(nn.Module):
                     piece = x[r][c]
                     planes[piece][r][c] = 1  # plane 0-2
 
-                    if (r, c) in self.bridge_neighbors:
+                    """ if (r, c) in self.bridge_neighbors:
                         for (rb, cb) in self.bridge_neighbors[(r, c)]:
                             if piece == 0:
                                 if x[rb][cb] == player:
@@ -162,7 +162,7 @@ class Actor(nn.Module):
                                     if x[r1][c1] == 0 and x[r2][c2] == 3 - player:
                                         planes[8][r1][c1] = 1
                                     elif x[r2][c2] == 0 and x[r1][c1] == 3 - player:
-                                        planes[8][r2][c2] = 1
+                                        planes[8][r2][c2] = 1 """
             out.append(planes)
         return torch.FloatTensor(out)
 
