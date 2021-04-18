@@ -1,5 +1,6 @@
 from collections import OrderedDict
 from math import sqrt
+from pathlib import Path
 from random import choice
 import sys
 import numpy as np
@@ -167,7 +168,9 @@ class Actor(nn.Module):
 
     def save_model(self, iterations: int) -> None:
         print(f'\nSaved model ANET_{iterations}')
-        torch.save(self.state_dict(), f'../models/{Config.model_dir}/ANET_{iterations}')
+        dir = f'../models/{Config.model_dir}'
+        Path(dir).mkdir(parents=True, exist_ok=True)
+        torch.save(self.state_dict(), dir + f'/ANET_{iterations}')
 
     def load_model(self, iterations: int):
         self.iterations = str(iterations)
