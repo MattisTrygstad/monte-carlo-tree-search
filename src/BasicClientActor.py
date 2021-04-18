@@ -13,7 +13,7 @@ class BasicClientActor(BasicClientActorAbs):
         BasicClientActorAbs.__init__(self, IP_address, verbose=verbose)
 
         self.actor = Actor(0, 0, 0, 6, Config.nn_dimentions, Config.nn_activation_functions, Config.optimizer)
-        self.actor.load_model(100)
+        self.actor.load_model(425)
 
     def handle_get_action(self, state):
         """
@@ -37,6 +37,17 @@ class BasicClientActor(BasicClientActorAbs):
         # next_move = ???
         ##############################
         state = list(state)
+
+        if self.series_id == 2:
+            # 1 -> 3
+            state[:] = [3 if x == 1 else x for x in state]
+
+            # 2 -> 1
+            state[:] = [1 if x == 2 else x for x in state]
+
+            # 3 -> 2
+            state[:] = [2 if x == 3 else x for x in state]
+
         player_num = state.pop(0)
         player = Player.ONE if player_num == 1 else Player.TWO
 

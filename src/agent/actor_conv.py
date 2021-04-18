@@ -86,6 +86,30 @@ class Actor(nn.Module):
 
         return action
 
+    def generate_probabilistic_action(self, state: UniversalState, legal_actions: list) -> UniversalAction:
+        input = state.generate_actor_input()
+
+        prediction = self.inference_softmax([input]).data.numpy()[0]
+
+        all_nodes = state.ordered_keys()
+
+        nodes: list = [1 if node in legal_actions else 0 for node in all_nodes]
+
+        for node_index in range(len(nodes)):
+            nodes[node_index] *= prediction[node_index]
+
+        nodes /= sum(nodes)
+
+        index = np.random.choice([x for x in range(len(nodes))], p=nodes)
+
+        size = sqrt(len(all_nodes))
+        action_coordinates = (index // size, index % size)
+
+        assert action_coordinates in legal_actions
+        action = UniversalAction(action_coordinates)
+
+        return action
+
     def fit(self, input: np.ndarray, target: np.ndarray) -> tuple:
         target = torch.FloatTensor(target)
         for i in range(self.epochs):
