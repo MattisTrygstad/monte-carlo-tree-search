@@ -52,21 +52,21 @@ class Actor(nn.Module):
 
         layers = OrderedDict([
             ('0', nn.ZeroPad2d(2)),
-            ('1', nn.Conv2d(9, nn_dimensions[0], 3)),
+            ('1', nn.Conv2d(9, nn_dimensions[0], 3, padding=1)),
             ('2', instantiate_activation_func(activation_functions[0]))])
-        for i in range(len(nn_dimensions) - 1):
-            layers[str(len(layers))] = nn.ZeroPad2d(1)
-            layers[str(len(layers))] = nn.Conv2d(nn_dimensions[i], nn_dimensions[i + 1], 3)
-            layers[str(len(layers))] = instantiate_activation_func(activation_functions[i + 1])
 
-        layers[str(len(layers))] = nn.Conv2d(nn_dimensions[-1], 1, 3)
-        #layers[str(len(layers))] = instantiate_activation_func(activation_functions[-1])
-        layers[str(len(layers))] = nn.Conv2d(1, 1, 1)
+        layers[str(len(layers))] = nn.Conv2d(nn_dimensions[0], nn_dimensions[1], 3, padding=1)
+        layers[str(len(layers))] = instantiate_activation_func(activation_functions[1])
+        layers[str(len(layers))] = nn.Conv2d(nn_dimensions[1], nn_dimensions[2], 3)
+        layers[str(len(layers))] = instantiate_activation_func(activation_functions[2])
+        layers[str(len(layers))] = nn.Flatten()
+
+        layers[str(len(layers))] = nn.Linear(2304, self.board_size**2)
 
         self.model = nn.Sequential(layers)
         self.loss_function = nn.CrossEntropyLoss()
         self.optimizer = instantiate_optimizer(optimizer, list(self.model.parameters()), self.learning_rate)
-        # print(self.model)
+        print(self.model)
 
     def generate_action(self, state: UniversalState, legal_actions: list) -> UniversalAction:
         input = state.generate_actor_input()

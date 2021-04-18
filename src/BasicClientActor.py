@@ -1,7 +1,9 @@
 import math
 from BasicClientActorAbs import BasicClientActorAbs
 from agent.actor_conv import Actor
+from agent.mcts import MonteCarloTree
 from enums import NodeState, Player
+from environment.universal_action import UniversalAction
 from environment.universal_state import UniversalState
 from utils.config_parser import Config
 
@@ -13,7 +15,14 @@ class BasicClientActor(BasicClientActorAbs):
         BasicClientActorAbs.__init__(self, IP_address, verbose=verbose)
 
         self.actor = Actor(0, 0, 0, 6, Config.nn_dimentions, Config.nn_activation_functions, Config.optimizer)
-        self.actor.load_model(425)
+        self.actor.load_model(140)
+
+        self.tree = MonteCarloTree(self.actor, 0, 1)
+
+        self.reset_flag = True
+
+        # Config
+        self.use_actor = True
 
     def handle_get_action(self, state):
         """
@@ -37,7 +46,6 @@ class BasicClientActor(BasicClientActorAbs):
         # next_move = ???
         ##############################
         state = list(state)
-
         if self.series_id == 2:
             # 1 -> 3
             state[:] = [3 if x == 1 else x for x in state]
@@ -61,9 +69,29 @@ class BasicClientActor(BasicClientActorAbs):
 
         legal_actions = [key for (key, value) in universal_state.nodes.items() if value == NodeState.EMPTY.value]
 
-        action = self.actor.generate_action(universal_state, legal_actions).coordinates
+        # Generate action from state and legal_actions
 
-        action = (int(action[0]), int(action[1]))
+        if self.use_actor:
+            action = self.actor.generate_action(universal_state, legal_actions).coordinates
+
+            action = (int(action[0]), int(action[1]))
+
+        else:
+            if self.reset_flag:
+                print('RESET')
+                self.tree.reset(universal_state)
+                self.reset_flag = False
+
+            self.tree.set_root()
+
+            self.tree.run_simulations(200, universal_state)
+
+            dist = self.tree.get_action_distribution(self.tree.root)
+
+            action = max(dist, key=dist.get)
+
+            universal_action = UniversalAction(action)
+            self.tree.set_root(universal_action)
 
         return action
 
@@ -95,6 +123,7 @@ class BasicClientActor(BasicClientActorAbs):
         :return
         """
         self.starting_player = start_player
+        self.reset_flag = True
         #############################
         #
         #
