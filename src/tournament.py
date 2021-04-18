@@ -21,6 +21,8 @@ class Tournament:
         self.env = StateManager(visual=True)
         self.load_agents(training_games, save_interval)
 
+        plt.close('all')
+
     def load_agents(self, training_games: int, save_interval: int) -> None:
 
         number_of_agents = int(training_games // save_interval) + 1
